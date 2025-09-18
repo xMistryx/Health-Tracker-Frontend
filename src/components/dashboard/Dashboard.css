@@ -1,8 +1,14 @@
 .dashboard-container {
   max-width: 900px;
+  height: 60%;
   margin: 0 auto;
   padding: 20px;
   font-family: Arial, sans-serif;
+}
+.landing-container {
+  height: 100%;
+  min-height: 120vh;
+  margin-top: -20%;
 }
 
 /* Date Picker */

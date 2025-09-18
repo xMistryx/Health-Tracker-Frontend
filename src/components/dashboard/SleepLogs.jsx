@@ -5,36 +5,80 @@ export default function SleepLogs({ date }) {
   const [sleepType, setSleepType] = useState("Sleep");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
-  const [duration, setDuration] = useState("");
+  const [minutes, setMinutes] = useState(0);
+
+  const calculateMinutes = (start, end) => {
+    if (!start || !end) return 0;
+
+    let startDate = new Date(`${date}T${start}`);
+    let endDate = new Date(`${date}T${end}`);
+
+    // Handle crossing midnight
+    if (endDate < startDate) endDate.setDate(endDate.getDate() + 1);
+
+    return Math.floor((endDate - startDate) / 60000);
+  };
+
+  const handleAddSleep = async () => {
+    if (!startTime || !endTime) return alert("Enter start and end times");
+
+    const sleepMinutes = calculateMinutes(startTime, endTime);
+    setMinutes(sleepMinutes);
+
+    try {
+      const res = await fetch("http://localhost:3000/api/sleep", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          date,
+          sleep_type: sleepType,
+          start_time: startTime,
+          end_time: endTime,
+          duration: sleepMinutes, // ✅ must send duration
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Failed to add sleep log");
+      }
+
+      const data = await res.json();
+      alert(`Sleep log added! ${sleepMinutes} minutes`);
+      setStartTime("");
+      setEndTime("");
+    } catch (err) {
+      console.error(err);
+      alert("Error adding sleep log: " + err.message);
+    }
+  };
 
   return (
     <div className="sleep-log">
-      {/* Left Icon */}
-      <img src={sleepIcon} alt="Sleep" />
-
-      {/* Inputs */}
+      <img
+        src={sleepIcon}
+        alt="Sleep"
+        style={{ width: "40px", height: "40px" }}
+      />
       <select value={sleepType} onChange={(e) => setSleepType(e.target.value)}>
         <option value="Sleep">Sleep</option>
         <option value="Nap">Nap</option>
       </select>
       <input
         type="time"
-        placeholder="Start Time"
         value={startTime}
         onChange={(e) => setStartTime(e.target.value)}
       />
       <input
         type="time"
-        placeholder="End Time"
         value={endTime}
         onChange={(e) => setEndTime(e.target.value)}
       />
-      <input
-        type="number"
-        placeholder="Duration (minutes)"
-        value={duration}
-        onChange={(e) => setDuration(e.target.value)}
-      />
+      <button onClick={handleAddSleep}>Add Sleep</button>
+      {minutes > 0 && <p>Slept {minutes} minutes</p>}
     </div>
   );
 }
