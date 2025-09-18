@@ -1,0 +1,155 @@
+.landing-container {
+  width: 100%;
+  min-height: 100vh; /* full viewport */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* center vertically */
+  align-items: center; /* center horizontally */
+  overflow: hidden;
+  background: #f5f5f5; /* fallback bg */
+  text-align: center; /* center text by default */
+  margin-left: 35%;
+}
+
+/* Desktop Images */
+.desktop-images {
+  display: flex;
+  justify-content: center; /* center images horizontally */
+  align-items: center;
+  width: 100%;
+  height: 50vh; /* adjust as needed */
+  gap: 1rem;
+}
+
+.desktop-images img {
+  flex: 1 1 30%;
+  max-width: 30%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+  transition: transform 0.4s ease-in-out;
+}
+
+.desktop-images img:hover {
+  transform: scale(1.05);
+}
+
+/* Mobile Image */
+.mobile-image {
+  display: none; /* hidden on desktop */
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.mobile-image img {
+  width: 100%;
+  max-width: 350px;
+  height: auto;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+/* Overlay content */
+.overlay {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  color: white;
+  max-width: 600px;
+  margin-top: 1.5rem;
+}
+
+.landing-text {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  line-height: 1.4;
+}
+
+.landing-button {
+  background: #f97316;
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 25px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.landing-button:hover {
+  background: #ea580c;
+}
+
+.landing-links {
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+  text-align: center; /* center links */
+}
+
+.signup-link {
+  color: #f97316;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.forgot-link {
+  font-size: 0.9rem;
+  color: #f97316;
+  cursor: pointer;
+  text-align: center;
+}
+.landing-header {
+  display: flex;
+  align-items: center; /* vertically center icon and text */
+  justify-content: flex-start; /* align to the left */
+  gap: 10px; /* space between icon and text */
+  margin-bottom: 20px; /* space between header and images */
+  padding-left: 20px; /* optional: some padding from the left edge */
+}
+
+.heart-icon {
+  width: 30px;
+  height: 30px;
+}
+
+.health-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+}
+
+/* Responsive for Mobile */
+@media (max-width: 768px) {
+  .desktop-images {
+    display: none; /* hide desktop images */
+  }
+
+  .mobile-image {
+    display: flex; /* show mobile image */
+  }
+
+  .landing-text {
+    font-size: 1.5rem;
+  }
+  .heart-icon {
+    width: 34px;
+    height: 34px;
+  }
+
+  .health-title {
+    font-size: 22px;
+  }
+  .landing-container {
+    margin-left: 20%; /* push content inward on small screens */
+  }
+}
+
+body {
+  overflow-x: hidden;
+}

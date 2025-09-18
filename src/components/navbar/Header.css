@@ -1,0 +1,38 @@
+.header-nav {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #3b82f6; /* blue-500 */
+  color: white;
+}
+
+.header-right {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.header-link {
+  text-decoration: none;
+  color: white;
+  transition: text-decoration 0.2s;
+}
+
+.header-link:hover {
+  text-decoration: underline;
+}
+
+.signout-btn {
+  background-color: #ef4444; /* red-500 */
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.25rem;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.signout-btn:hover {
+  background-color: #dc2626; /* darker red */
+}
