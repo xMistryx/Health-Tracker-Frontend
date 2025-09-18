@@ -1,0 +1,92 @@
+.dashboard-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+/* Date Picker */
+.date-picker-container {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.date-picker-container input[type="date"] {
+  padding: 8px 12px;
+  font-size: 1rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+/* Logs Section */
+.logs-section {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+/* Individual Logs */
+.water-log,
+.sleep-log,
+.exercise-log {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 12px 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+/* Icons */
+.water-log img,
+.sleep-log img,
+.exercise-log img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+/* Inputs and selects */
+.water-log input,
+.sleep-log input,
+.sleep-log select,
+.exercise-log input,
+.exercise-log select {
+  padding: 8px 10px;
+  font-size: 0.95rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+/* Submit Button */
+.submit-btn {
+  padding: 10px 25px;
+  font-size: 1rem;
+  background-color: #0077cc;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.submit-btn:hover {
+  background-color: #005fa3;
+}
+
+/* Responsive for small screens */
+@media (max-width: 600px) {
+  .water-log,
+  .sleep-log,
+  .exercise-log {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .water-log img,
+  .sleep-log img,
+  .exercise-log img {
+    margin-bottom: 10px;
+  }
+}
