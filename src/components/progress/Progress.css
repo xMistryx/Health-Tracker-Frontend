@@ -1,0 +1,108 @@
+.progress-container {
+  padding: 20px;
+  text-align: center;
+}
+
+.back-btn {
+  background: #f87171;
+  border: none;
+  padding: 8px 16px;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+  gap: 10px;
+}
+
+.tab {
+  background: #219342;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.tab.active {
+  background: #3b82f6;
+  color: white;
+}
+
+.filters {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.filters button {
+  background: #66d4ae;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.chart-container {
+  margin: 0 auto;
+  max-width: 600px;
+}
+
+.stats {
+  margin-top: 15px;
+}
+.progress-container {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap; /* for mobile: stack columns */
+}
+
+.left-column {
+  display: flex;
+  flex-direction: column;
+  width: 180px; /* fixed width */
+  min-width: 150px;
+  gap: 10px;
+}
+
+.right-column {
+  flex: 1; /* expand to fill remaining space */
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.range-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.chart-container {
+  height: 300px;
+  width: 100%;
+}
+h1 {
+  font-size: 2.5em;
+  line-height: 1.1;
+  text-align: center;
+  font-weight: bold;
+}
+.left-column {
+  display: flex;
+  flex-direction: column;
+  width: 180px;
+  min-width: 150px;
+  gap: 10px;
+  margin-top: 22%;
+}
+@media (prefers-color-scheme: light) {
+  button {
+    background-color: #9ed99b;
+  }
+}
