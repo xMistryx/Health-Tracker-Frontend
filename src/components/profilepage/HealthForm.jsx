@@ -89,9 +89,9 @@ export default function HealthForm({ token, onSubmit, existingData }) {
           onChange={(e) => setBiologicalSex(e.target.value)}
         >
           <option value="">Select</option>
-          <option value="male">Male</option>
-          <option value="female">Female</option>
-          <option value="other">Intersex</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Intersex">Intersex</option>
         </select>
       </label>
 

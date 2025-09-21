@@ -1,21 +1,49 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import "./Header.css"; // Import the CSS file
+import "./Header.css";
 
-export default function Header({ user, onSignOut }) {
+export default function Header() {
+  const [showDropdown, setShowDropdown] = useState(false);
+
   return (
-    <nav className="header-nav">
-      <div className="header-right">
-        <Link to="/profile" className="header-link">
-          Profile
-        </Link>
-        <Link to="/dashboard" className="header-link">
-          Dashboard
-        </Link>
-        <button onClick={onSignOut} className="signout-btn">
-          Sign Out
-        </button>
-      </div>
+    <nav className="navbar">
+      <ul className="nav-links">
+        <li>
+          <Link to="/">Home</Link>
+        </li>
+        <li>
+          <Link to="/dashboard">Dashboard</Link>
+        </li>
+        <li>
+          <Link to="/profile">Profile</Link>
+        </li>
+
+        {/* Progress with Dropdown */}
+        <li
+          className="dropdown"
+          onMouseEnter={() => setShowDropdown(true)}
+          onMouseLeave={() => setShowDropdown(false)}
+        >
+          <span className="dropbtn">Progress ▾</span>
+          {showDropdown && (
+            <ul className="dropdown-content">
+              <li>
+                <Link to="/progress/water">Water</Link>
+              </li>
+              <li>
+                <Link to="/progress/sleep">Sleep</Link>
+              </li>
+              <li>
+                <Link to="/progress/exercise">Exercise</Link>
+              </li>
+            </ul>
+          )}
+        </li>
+
+        <li>
+          <button className="signout-btn">Sign Out</button>
+        </li>
+      </ul>
     </nav>
   );
 }

@@ -1,0 +1,140 @@
+/* Progress.css - layout + controls for progress pages */
+
+.progress-page {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  box-sizing: border-box;
+  min-height: calc(100vh - 80px); /* adjust if you have a top header */
+}
+
+/* LEFT column (fixed width) */
+.left-column {
+  width: 220px;
+  min-width: 180px;
+  background: #f3f4f6;
+  padding: 16px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+/* simple button styles in left column */
+.left-column .btn {
+  display: inline-block;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 6px;
+  background: #61c487;
+  color: #111827;
+  cursor: pointer;
+  text-align: left;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+.left-column .btn:hover {
+  background: #e6e6e6;
+}
+
+.left-column .btn-primary {
+  background: #10b981;
+  color: white;
+}
+.left-column .btn-primary:hover {
+  filter: brightness(0.95);
+}
+
+/* RIGHT column (flexible) */
+.right-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0; /* allow shrinking for overflow */
+}
+
+/* range buttons row */
+.range-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-range {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  background: #61c487;
+  cursor: pointer;
+}
+.btn-range:hover {
+  filter: brightness(0.97);
+}
+.btn-range.active {
+  background: #2563eb;
+  color: #fff;
+}
+
+/* Card like container for charts */
+.chart-card {
+  background: #fff;
+  padding: 14px;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(16, 24, 40, 0.06);
+  height: 360px; /* fixed height so recharts can render */
+  box-sizing: border-box;
+}
+
+/* smaller donut card */
+.donut-card {
+  background: #fff;
+  padding: 14px;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(16, 24, 40, 0.06);
+  height: 220px; /* fixed height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  box-sizing: border-box;
+}
+
+/* stats row */
+.stats-row {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
+/* Responsive: stack on small screens */
+@media (max-width: 880px) {
+  .progress-page {
+    flex-direction: column;
+    padding: 12px;
+    min-height: auto;
+  }
+
+  .left-column {
+    width: 100%;
+    flex-direction: row;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 8px;
+  }
+
+  .left-column .btn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  .chart-card {
+    height: 300px;
+  }
+  .donut-card {
+    height: 180px;
+  }
+}

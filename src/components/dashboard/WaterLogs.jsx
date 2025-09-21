@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import waterIcon from "../../assets/images/water-icon.png";
+import { WaterContext } from "../../context/WaterContext";
 
 export default function WaterLogs({ date }) {
   const [amount, setAmount] = useState("");
+  const { setTodayOz } = useContext(WaterContext); // ✅ context setter
 
   const handleAddWater = async () => {
     if (!amount) return alert("Enter amount!");
@@ -12,17 +14,20 @@ export default function WaterLogs({ date }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // needed b/c requireUser
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
           date,
-          amount_oz: Number(amount), // ✅ must match backend column name
+          amount_oz: Number(amount),
         }),
       });
 
       if (res.ok) {
         alert("Water log added!");
-        setAmount(""); // clear input
+        setAmount("");
+
+        // ✅ update context so WaterProgress refreshes immediately
+        setTodayOz((prev) => prev + Number(amount));
       } else {
         const err = await res.json();
         alert("Error: " + err.error);
