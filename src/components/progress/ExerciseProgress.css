@@ -1,0 +1,111 @@
+.progress-container {
+  display: flex;
+}
+
+.left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-right: 20px;
+}
+
+.right-column {
+  flex: 1;
+}
+
+.btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  background: #e6e6e6;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn:hover {
+  background: #ccc;
+}
+
+.btn-exercise {
+  background: #e6e6e6; /* same as other buttons */
+  color: black;
+}
+
+.range-buttons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.btn-range {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: white;
+  cursor: pointer;
+}
+
+.btn-range.active {
+  background: #4f6b57; /* Deep Moss */
+  color: white;
+  border-color: #4f6b57;
+}
+
+.exercise-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 6px;
+  border-radius: 6px;
+}
+
+.exercise-row.today {
+  background-color: rgba(168, 195, 160, 0.2); /* Sage Green tint */
+}
+
+.day-label {
+  width: 120px;
+  font-weight: 500;
+}
+
+.exercise-timeline {
+  flex: 1;
+  display: flex;
+  gap: 4px;
+  position: relative;
+}
+
+.exercise-block {
+  height: 24px;
+  border-radius: 4px;
+}
+
+.total-minutes {
+  width: 80px;
+  text-align: right;
+  font-weight: bold;
+  color: #4f6b57; /* Deep Moss */
+}
+.btn-exercise.active {
+  background: #a8c3a0; /* Sage Green */
+  color: white;
+}
+.btn-sleep {
+  background: #e6e6e6;
+  color: black;
+}
+
+.btn-sleep.active {
+  background: green;
+  color: white;
+}
+
+.btn-water {
+  background: #e6e6e6;
+  color: black;
+}
+
+.btn-water.active {
+  background: #a8c3a0;
+  color: white;
+}

@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import sleepIcon from "../../assets/images/sleep-icon.jpg";
+import { SleepContext } from "../../context/SleepContext.jsx";
 
 export default function SleepLogs({ date }) {
   const [sleepType, setSleepType] = useState("Sleep");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [minutes, setMinutes] = useState(0);
+
+  const { addSleepLog } = useContext(SleepContext);
 
   const calculateMinutes = (start, end) => {
     if (!start || !end) return 0;
@@ -26,27 +29,14 @@ export default function SleepLogs({ date }) {
     setMinutes(sleepMinutes);
 
     try {
-      const res = await fetch("http://localhost:3000/api/sleep", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({
-          date,
-          sleep_type: sleepType,
-          start_time: startTime,
-          end_time: endTime,
-          duration: sleepMinutes, // ✅ must send duration
-        }),
+      await addSleepLog({
+        date,
+        sleep_type: sleepType,
+        start_time: startTime,
+        end_time: endTime,
+        duration: sleepMinutes,
       });
 
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Failed to add sleep log");
-      }
-
-      const data = await res.json();
       alert(`Sleep log added! ${sleepMinutes} minutes`);
       setStartTime("");
       setEndTime("");
