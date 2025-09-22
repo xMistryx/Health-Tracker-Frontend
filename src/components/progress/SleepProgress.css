@@ -1,0 +1,78 @@
+.progress-container {
+  display: flex;
+}
+
+.left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-right: 20px;
+}
+
+.right-column {
+  flex: 1;
+}
+
+.btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  background-color: #a8c3a0;
+  color: black;
+  cursor: pointer;
+  margin-bottom: 5px;
+}
+
+.btn-range {
+  padding: 5px 10px;
+  margin-right: 5px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-range.active {
+  background-color: #6fa49c;
+  color: white;
+}
+
+.sleep-row {
+  display: flex;
+  align-items: flex-start; /* Align segments at top for stacked bars */
+  margin-bottom: 10px; /* More spacing between rows */
+  padding: 4px;
+  border-radius: 4px;
+  min-height: 40px; /* Ensure enough space for stacked segments */
+}
+
+.sleep-row.today {
+  background-color: #a8c3a0;
+}
+
+.day-label {
+  width: 120px;
+  padding-top: 4px; /* Align text with stacked segments */
+}
+
+.timeline {
+  flex: 1;
+  position: relative;
+  background: #e0e0e0;
+  border-radius: 4px;
+  margin: 0 10px;
+  padding: 2px 0; /* Small padding to separate stacked bars from edges */
+}
+
+.segment {
+  position: absolute;
+  height: 18px; /* Slightly smaller than total row for spacing */
+  border-radius: 4px;
+}
+
+.total-hours {
+  width: 60px;
+  text-align: right;
+  font-weight: bold;
+  color: #4f6b57;
+  padding-top: 4px; /* Align with top of segments */
+}
