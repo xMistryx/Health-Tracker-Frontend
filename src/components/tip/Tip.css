@@ -1,0 +1,19 @@
+.tip-box {
+  background-color: #bac9b2;
+  border: 1px solid #bac9b2;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 10px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.tip-box p {
+  margin: 0;
+  color: #4f6b57;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.tip-box strong {
+  color: #2d4a33;
+}

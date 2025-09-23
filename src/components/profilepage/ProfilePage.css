@@ -1,0 +1,101 @@
+/* ProfilePage.css */
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.profile-container {
+  margin: 50px auto;
+  padding: 30px;
+  background-color: #bac9b2;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.profile-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.profile-container p {
+  font-size: 16px;
+  margin: 8px 0;
+}
+
+.profile-container input, select {
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #bac9b2;
+  font-size: 1rem;
+  background: #e8e6e1;
+  color: #4f6b57;
+}
+
+.profile-container button {
+  display: block;
+  margin: 20px auto 0 auto;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #d9a48f;
+  color: #4f6b57;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.profile-container button:hover {
+  background-color: #e08b69;
+}
+
+/* HealthForm.css */
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 20px;
+}
+
+form h2 {
+  text-align: center;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  font-size: 14px;
+  color: #4f6b57;
+}
+
+input,
+select {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-top: 5px;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+}
+
+button[type="submit"] {
+  padding: 12px 20px;
+  font-size: 16px;
+  background-color: #d9a48f;;
+  color: #4f6b57;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+  background-color: #e08b69;
+}
+

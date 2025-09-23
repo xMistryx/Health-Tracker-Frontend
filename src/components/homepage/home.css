@@ -1,0 +1,94 @@
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.desktop-images {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 50vh; 
+  gap: 1rem;
+}
+
+.desktop-images img {
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+  transition: transform 0.4s;
+}
+
+.overlay {
+  background: #bac9b2;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  border-radius: 12px;
+  max-width: 600px;
+  margin: 1.5rem auto 0 auto;
+}
+
+.landing-text {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  line-height: 1.4;
+}
+
+.landing-button {
+  background: #d9a48f;
+  color: #4f6b57;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 25px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin-bottom: 1rem;
+}
+
+.landing-button:hover {
+  background: #e08b69;
+}
+
+.landing-links {
+  color: #4f6b57;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+}
+
+.signup-link {
+  color: #6fa49c;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.forgot-link {
+  font-size: 0.9rem;
+  color: #4f6b57;
+  cursor: pointer;
+}
+.landing-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.sprout-icon {
+  width: 30px;
+  height: 30px;
+}
+
+.health-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #4f6b57;
+}
+
+@media (max-width: 768px) {
+  .health-title {
+    font-size: 22px;
+  }
+}

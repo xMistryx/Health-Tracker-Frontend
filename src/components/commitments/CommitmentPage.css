@@ -1,0 +1,75 @@
+.commitment-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+/* .commitment-page .controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+} */
+.year-grid {
+  /* lay out month cards horizontally and wrap to new lines as needed */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-start;
+  justify-content: center;
+  margin-block: 20px;
+}
+.month-row {
+  /* treat each month as a vertical card: label on top, grid of days below */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  /* fixed width keeps the months uniform; adjust as needed */
+  width: 110px;
+}
+.month-label {
+  font-size: 12px;
+}
+.month-days {
+  /* Show days in a week-like 7-column grid so each month looks like small calendar */
+  display: grid;
+  grid-template-columns: repeat(7, 12px);
+  gap: 4px;
+  align-items: center;
+}
+.day-block {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  border: 1px solid #4f6b5736;
+}
+
+.day-block.logged {
+  opacity: 0.9;
+}
+.day-block.goal-met {
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.02) inset;
+}
+.loading {
+  margin-left: 8px;
+  font-size: 13px;
+  color: #666;
+}
+.commit-label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 30px;
+} 
+.commit-select {
+    font-size: 14px;
+    background-color: #d9a48f;
+    border: 1px solid #d9a48f;
+    border-radius: 6px;
+    margin: 0;
+}
+
+.commit-select:hover {
+  background-color: #e08b69;
+}
