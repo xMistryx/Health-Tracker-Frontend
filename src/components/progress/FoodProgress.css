@@ -1,0 +1,36 @@
+.food-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 8px;
+  border-radius: 6px;
+}
+.food-row.today {
+  background: #a8c3a033; /* Sage green tint */
+}
+.meal-blocks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 1;
+}
+.meal-block {
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #d9a48f; /* base clay blush */
+  font-size: 0.85rem;
+  color: #fff;
+  cursor: pointer;
+}
+.meal-block.intensity-2 {
+  background: #c28d79;
+}
+.meal-block.intensity-3 {
+  background: #a87465;
+}
+.meal-block.intensity-4 {
+  background: #8f5f52;
+}
+.meal-block.intensity-5 {
+  background: #754b3f;
+}
