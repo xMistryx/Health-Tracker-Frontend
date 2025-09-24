@@ -96,3 +96,51 @@
     margin-bottom: 10px;
   }
 }
+.food-log {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 12px 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.food-log img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.food-log input {
+  padding: 8px 10px;
+  font-size: 0.95rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.submit-btn {
+  padding: 10px 25px;
+  font-size: 1rem;
+  background-color: #0077cc;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.submit-btn:hover {
+  background-color: #005fa3;
+}
+
+@media (max-width: 600px) {
+  .food-log {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .food-log img {
+    margin-bottom: 10px;
+  }
+}

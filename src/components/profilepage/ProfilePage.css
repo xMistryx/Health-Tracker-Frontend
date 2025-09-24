@@ -1,103 +1,165 @@
-/* ProfilePage.css */
-
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f8f9fa;
-  color: #333;
   margin: 0;
-  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #e6f0fa;
+  display: flex;
+  justify-content: center; /* center horizontally */
+  align-items: center; /* center vertically */
+  min-height: 100vh; /* full viewport height */
 }
 
+/* Profile container */
 .profile-container {
-  max-width: 600px;
-  margin: 50px auto;
-  padding: 30px;
+  max-width: 900px;
+  width: 95%;
+  min-height: 90vh; /* fit most of the viewport */
+  margin: 20px auto;
   background-color: #fff;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
-.profile-container h2 {
-  text-align: center;
-  margin-bottom: 20px;
-  color: #2c3e50;
-}
-
-.profile-container p {
-  font-size: 16px;
-  margin: 8px 0;
-}
-
-.profile-container button {
-  display: block;
-  margin: 20px auto 0 auto;
-  padding: 10px 20px;
-  font-size: 16px;
+/* Desktop Navigation */
+.nav-desktop {
+  display: flex;
+  justify-content: space-around;
   background-color: #3498db;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.profile-container button:hover {
-  background-color: #2980b9;
-}
-
-/* HealthForm.css */
-
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  padding: 20px;
-}
-
-form h2 {
-  text-align: center;
-  color: #2c3e50;
-}
-
-label {
-  display: flex;
-  flex-direction: column;
+  color: white;
+  padding: 12px 0;
+  border-radius: 10px;
+  margin-bottom: 20px;
   font-weight: bold;
-  font-size: 14px;
-  color: #34495e;
-}
-
-input,
-select {
-  padding: 8px 12px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  margin-top: 5px;
-}
-
-input:focus,
-select:focus {
-  border-color: #3498db;
-  outline: none;
-}
-
-button[type="submit"] {
-  padding: 12px 20px;
-  font-size: 16px;
-  background-color: #27ae60;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+}
+.nav-desktop span:hover {
+  opacity: 0.8;
 }
 
-button[type="submit"]:hover {
-  background-color: #1e8449;
+/* Mobile Nav */
+.nav-mobile {
+  display: none;
+  position: relative; /* not fixed anymore */
+  width: 100%; /* fits container */
+  background-color: #3498db;
+  padding: 10px 0;
+  justify-content: space-around;
+  margin-top: 20px; /* some spacing from stats cards */
+  border-radius: 10px;
 }
 
-p {
-  color: red;
-  text-align: center;
+.nav-mobile img {
+  width: 35px;
+  height: 35px;
+  cursor: pointer;
+}
+@media (max-width: 768px) {
+  .nav-desktop {
+    display: none;
+  }
+  .nav-mobile {
+    display: flex;
+  }
+}
+@media (min-width: 769px) {
+  .nav-mobile {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-mobile {
+    display: flex;
+  }
+}
+
+/* Profile Header */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.profile-image-wrapper {
+  position: relative;
+}
+.profile-image {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Edit / Camera Icon */
+.edit-icon,
+.camera-icon img {
+  width: 28px; /* smaller size */
+  height: 28px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  cursor: pointer;
+  border-radius: 50%;
+  border: 2px solid white;
+  background-color: #3498db;
+  padding: 2px;
+}
+
+/* Username */
+.username {
+  font-size: 24px;
+  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Age/Height/Weight */
+.profile-stats-table {
+  margin-top: 20px;
+}
+.labels-row,
+.values-row {
+  display: flex;
+  justify-content: space-around;
+  font-weight: bold;
+}
+.values-row span {
+  font-weight: normal;
+}
+
+/* Stats Cards */
+.stats-column {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+  margin-top: 25px;
+}
+@media (min-width: 768px) {
+  .stats-column {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: #f1f5f9;
+  padding: 15px 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+.stat-row img {
+  width: 40px;
+  height: 40px;
+}
+.stat-row small {
+  margin-left: auto;
+  color: #777;
+  font-size: 14px;
+}
+.stat-row span {
+  font-size: 18px;
+  font-weight: bold;
 }

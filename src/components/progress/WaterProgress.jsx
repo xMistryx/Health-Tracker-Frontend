@@ -175,6 +175,12 @@ export default function WaterProgress() {
           >
             Exercise
           </button>
+          <button
+            onClick={() => navigate("/progress/food")}
+            className="btn btn-food"
+          >
+            Food
+          </button>
         </div>
 
         {/* Right content */}

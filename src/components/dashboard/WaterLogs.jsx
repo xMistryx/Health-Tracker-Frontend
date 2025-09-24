@@ -1,10 +1,13 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useRef } from "react";
 import waterIcon from "../../assets/images/water-icon.png";
-import { WaterContext } from "../../context/WaterContext";
+import { WaterContext } from "../../context/WaterContext.jsx";
+import EncouragementToast from "./EncouragementToast.jsx";
 
-export default function WaterLogs({ date }) {
+export default function WaterLogs({ date, userId }) {
   const [amount, setAmount] = useState("");
-  const { setTodayOz } = useContext(WaterContext); // ✅ context setter
+  const { setTodayOz } = useContext(WaterContext);
+  const [toastMessage, setToastMessage] = useState("");
+  const lastMilestoneRef = useRef("");
 
   const handleAddWater = async () => {
     if (!amount) return alert("Enter amount!");
@@ -23,11 +26,26 @@ export default function WaterLogs({ date }) {
       });
 
       if (res.ok) {
-        alert("Water log added!");
+        setTodayOz((prev) => prev + Number(amount));
         setAmount("");
 
-        // ✅ update context so WaterProgress refreshes immediately
-        setTodayOz((prev) => prev + Number(amount));
+        // ✅ Fetch latest milestone
+        const milestoneRes = await fetch(
+          `http://localhost:3000/api/encouragements/all/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        const milestoneData = await milestoneRes.json();
+        const latest = milestoneData.Water;
+        if (latest && latest !== lastMilestoneRef.current) {
+          setToastMessage(latest);
+          lastMilestoneRef.current = latest;
+        }
+
+        alert("Water log added!");
       } else {
         const err = await res.json();
         alert("Error: " + err.error);
@@ -48,6 +66,12 @@ export default function WaterLogs({ date }) {
         onChange={(e) => setAmount(e.target.value)}
       />
       <button onClick={handleAddWater}>Add</button>
+
+      {/* Toast */}
+      <EncouragementToast
+        message={toastMessage}
+        onClose={() => setToastMessage("")}
+      />
     </div>
   );
 }

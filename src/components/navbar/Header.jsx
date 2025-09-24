@@ -36,6 +36,9 @@ export default function Header() {
               <li>
                 <Link to="/progress/exercise">Exercise</Link>
               </li>
+              <li>
+                <Link to="/progress/food">Food</Link> {/* Added Food here */}
+              </li>
             </ul>
           )}
         </li>

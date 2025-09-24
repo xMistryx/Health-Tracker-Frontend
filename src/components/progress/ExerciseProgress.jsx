@@ -130,6 +130,12 @@ export default function ExerciseProgress() {
           >
             Exercise
           </button>
+          <button
+            onClick={() => navigate("/progress/food")}
+            className="btn btn-food"
+          >
+            Food
+          </button>
         </div>
 
         {/* RIGHT COLUMN CONTENT */}

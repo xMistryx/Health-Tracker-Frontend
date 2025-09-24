@@ -4,6 +4,8 @@ import Header from "../navbar/Header.jsx";
 import WaterLogs from "./WaterLogs";
 import SleepLogs from "./SleepLogs";
 import ExerciseLogs from "./ExerciseLogs";
+import FoodLogs from "./FoodLogs";
+
 import "./Dashboard.css";
 
 export default function Dashboard({ user, onSignOut }) {
@@ -22,9 +24,10 @@ export default function Dashboard({ user, onSignOut }) {
       </div>
 
       <div className="logs-section">
-        <WaterLogs date={date} />
-        <SleepLogs date={date} />
-        <ExerciseLogs date={date} />
+        <WaterLogs date={date} userId={user.id} />
+        <SleepLogs date={date} userId={user.id} />
+        <ExerciseLogs date={date} userId={user.id} />
+        <FoodLogs date={date} userId={user.id} />
       </div>
     </div>
   );

@@ -148,6 +148,12 @@ export default function SleepProgress() {
           >
             Exercise
           </button>
+          <button
+            onClick={() => navigate("/progress/food")}
+            className="btn btn-food"
+          >
+            Food
+          </button>
         </div>
 
         <div className="right-column">

@@ -1,14 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import exerciseIcon from "../../assets/images/fitness-icon.jpg";
+import EncouragementToast from "./EncouragementToast.jsx";
 
-export default function ExerciseLogs({ date }) {
+export default function ExerciseLogs({ date, userId }) {
   const [exerciseType, setExerciseType] = useState("Stretching");
   const [duration, setDuration] = useState("");
+  const [toastMessage, setToastMessage] = useState("");
+  const lastMilestoneRef = useRef(""); // track last milestone
 
   const handleAddExercise = async () => {
-    if (!exerciseType || duration === "") {
-      return alert("Enter all fields!");
-    }
+    if (!exerciseType || duration === "") return alert("Enter all fields!");
 
     try {
       const res = await fetch("http://localhost:3000/api/exercise_logs", {
@@ -29,9 +30,22 @@ export default function ExerciseLogs({ date }) {
         throw new Error(err.error || "Failed to add exercise log");
       }
 
-      const data = await res.json();
+      // ✅ Fetch latest milestone after adding
+      const milestoneRes = await fetch(
+        `http://localhost:3000/api/encouragements/all/${userId}`,
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+      const milestoneData = await milestoneRes.json();
+      const latest = milestoneData.Exercise;
+      if (latest && latest !== lastMilestoneRef.current) {
+        setToastMessage(latest);
+        lastMilestoneRef.current = latest;
+      }
+
       alert(`Exercise log added: ${exerciseType} for ${duration} minutes`);
-      setDuration(""); // reset input
+      setDuration("");
     } catch (err) {
       console.error(err);
       alert("Error adding exercise log: " + err.message);
@@ -40,14 +54,11 @@ export default function ExerciseLogs({ date }) {
 
   return (
     <div className="exercise-log">
-      {/* Left Icon */}
       <img
         src={exerciseIcon}
         alt="Exercise"
         style={{ width: "40px", height: "40px", marginRight: "10px" }}
       />
-
-      {/* Inputs */}
       <select
         value={exerciseType}
         onChange={(e) => setExerciseType(e.target.value)}
@@ -58,15 +69,19 @@ export default function ExerciseLogs({ date }) {
         <option value="Flexibility Training">Flexibility Training</option>
         <option value="Balance Training">Balance Training</option>
       </select>
-
       <input
         type="number"
         placeholder="Duration (minutes)"
         value={duration}
         onChange={(e) => setDuration(e.target.value)}
       />
-
       <button onClick={handleAddExercise}>Add</button>
+
+      {/* Toast */}
+      <EncouragementToast
+        message={toastMessage}
+        onClose={() => setToastMessage("")}
+      />
     </div>
   );
 }

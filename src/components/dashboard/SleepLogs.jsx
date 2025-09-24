@@ -1,24 +1,24 @@
-import React, { useState, useContext } from "react";
+// src/components/dashboard/SleepLogs.jsx
+import React, { useState, useContext, useRef } from "react";
 import sleepIcon from "../../assets/images/sleep-icon.jpg";
 import { SleepContext } from "../../context/SleepContext.jsx";
+import EncouragementToast from "./EncouragementToast.jsx";
 
-export default function SleepLogs({ date }) {
+export default function SleepLogs({ date, userId }) {
   const [sleepType, setSleepType] = useState("Sleep");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [minutes, setMinutes] = useState(0);
+  const [toastMessage, setToastMessage] = useState(""); // for milestone toast
+  const lastMilestoneRef = useRef(""); // track last milestone shown
 
   const { addSleepLog } = useContext(SleepContext);
 
   const calculateMinutes = (start, end) => {
     if (!start || !end) return 0;
-
     let startDate = new Date(`${date}T${start}`);
     let endDate = new Date(`${date}T${end}`);
-
-    // Handle crossing midnight
-    if (endDate < startDate) endDate.setDate(endDate.getDate() + 1);
-
+    if (endDate < startDate) endDate.setDate(endDate.getDate() + 1); // handle crossing midnight
     return Math.floor((endDate - startDate) / 60000);
   };
 
@@ -37,7 +37,22 @@ export default function SleepLogs({ date }) {
         duration: sleepMinutes,
       });
 
-      alert(`Sleep log added! ${sleepMinutes} minutes`);
+      // Fetch latest Sleep milestone
+      const res = await fetch(
+        `http://localhost:3000/api/encouragements/all/${userId}`,
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+      if (res.ok) {
+        const milestoneData = await res.json();
+        const latest = milestoneData.Sleep;
+        if (latest && latest !== lastMilestoneRef.current) {
+          setToastMessage(latest);
+          lastMilestoneRef.current = latest;
+        }
+      }
+
       setStartTime("");
       setEndTime("");
     } catch (err) {
@@ -69,6 +84,12 @@ export default function SleepLogs({ date }) {
       />
       <button onClick={handleAddSleep}>Add Sleep</button>
       {minutes > 0 && <p>Slept {minutes} minutes</p>}
+
+      {/* Toast for latest milestone */}
+      <EncouragementToast
+        message={toastMessage}
+        onClose={() => setToastMessage("")}
+      />
     </div>
   );
 }

@@ -7,6 +7,7 @@ import Progress from "./components/progress/Progress.jsx";
 import WaterProgress from "./components/progress/WaterProgress.jsx";
 import SleepProgress from "./components/progress/SleepProgress.jsx";
 import ExerciseProgress from "./components/progress/ExerciseProgress.jsx";
+import FoodProgress from "./components/progress/FoodProgress.jsx";
 
 import SignIn from "./components/auth/SignInForm.jsx";
 import SignUp from "./components/auth/SignUpForm.jsx";
@@ -39,6 +40,7 @@ function App() {
               <Route path="/progress/water" element={<WaterProgress />} />
               <Route path="/progress/sleep" element={<SleepProgress />} />
               <Route path="/progress/exercise" element={<ExerciseProgress />} />
+              <Route path="/progress/food" element={<FoodProgress />} />
             </Routes>
           </Router>
         </ExerciseProvider>
