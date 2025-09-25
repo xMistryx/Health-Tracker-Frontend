@@ -1,0 +1,79 @@
+.sleep-page-container {
+  padding: 80px 20px 20px 20px; /* Top padding to account for fixed header */
+}
+
+.sleep-progress-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.sleep-left-column {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+}
+
+.sleep-right-column {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.sleep-btn {
+  padding: 8px 12px;
+  margin-block: 8px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.sleep-sleep-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  border-radius: 4px;
+}
+
+.sleep-sleep-row.today {
+  background-color: #aac9a056;
+}
+
+.sleep-sleep-row.today .sleep-timeline {
+  background: #bfd4b6;
+}
+
+.sleep-timeline {
+  width: 400px;
+  min-width: 400px;
+  position: relative;
+  background: #dad8d3;
+  border-radius: 4px;
+  margin: 0 10px;
+}
+
+.sleep-segment {
+  position: absolute;
+  height: 22px; 
+  border-radius: 4px;
+}
+
+.sleep-total-hours {
+  width: 70px;
+  text-align: right;
+  font-weight: bold;
+  color: #4f6b57;
+}
+
+.sleep-grid.mt-4 {
+  display: flex;
+  flex-direction: column;
+}
+
+.sleep-day-label {
+  width: 20px;
+}

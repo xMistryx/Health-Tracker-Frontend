@@ -4,9 +4,9 @@ import HomePage from "./components/homepage/HomePage.jsx";
 import Dashboard from "./components/dashboard/Dashboard.jsx";
 import ProfilePage from "./components/profilepage/ProfilePage.jsx";
 import CommitmentPage from "./components/commitments/CommitmentPage.jsx";
-import WaterLogs from "./components/logs/WaterLogs.jsx";
-import SleepLogs from "./components/logs/SleepLogs.jsx";
-import ExerciseLogs from "./components/logs/ExerciseLogs.jsx";
+import WaterLogs from "./components/logs/water/WaterLogs.jsx";
+import SleepLogs from "./components/logs/sleep/SleepLogs.jsx";
+import ExerciseLogs from "./components/logs/exercise/ExerciseLogs.jsx";
 
 export default function App() {
   return (

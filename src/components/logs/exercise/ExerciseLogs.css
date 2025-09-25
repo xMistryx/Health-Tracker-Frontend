@@ -1,0 +1,103 @@
+.exercise-page-container {
+  padding: 80px 20px 20px 20px; /* Top padding to account for fixed header */
+}
+
+.exercise-progress-container {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+}
+
+.exercise-left-column {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 10px;
+}
+
+.exercise-right-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.exercise-btn {
+  padding: 8px 12px;
+  margin-block: 8px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.exercise-exercise-row {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  border-radius: 6px;
+}
+
+.exercise-exercise-row.today {
+  background-color: #aac9a056;
+}
+
+.exercise-exercise-row.today .exercise-exercise-timeline {
+  background: #bfd4b6;
+}
+
+.exercise-day-label {
+  width: 50px;
+  font-weight: 500;
+}
+
+.exercise-exercise-timeline {
+  width: 400px;
+  min-width: 400px;
+  min-height: 20px;
+  display: flex;
+  gap: 4px;
+  background: #dad8d3;
+  position: relative;
+  border-radius: 4px;
+  padding: 2px;
+}
+
+.exercise-exercise-block {
+  height: 20px;
+  border-radius: 4px;
+}
+
+.exercise-total-minutes {
+  width: 80px;
+  text-align: right;
+  font-weight: bold;
+  color: #4f6b57; /* Deep Moss */
+}
+.exercise-btn-exercise.active {
+  background: #a8c3a0; /* Sage Green */
+  color: white;
+}
+.exercise-btn-sleep {
+  background: #e6e6e6;
+  color: black;
+}
+
+.exercise-btn-sleep.active {
+  background: green;
+  color: white;
+}
+
+.exercise-btn-water {
+  background: #e6e6e6;
+  color: black;
+}
+
+.exercise-btn-water.active {
+  background: #a8c3a0;
+  color: white;
+}
+
+.exercise-grid.mt-4 {
+  display: flex;
+  flex-direction: column;
+}

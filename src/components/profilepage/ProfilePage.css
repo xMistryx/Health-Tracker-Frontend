@@ -51,7 +51,7 @@ body {
 
 /* HealthForm.css */
 
-form {
+.ppform {
   display: flex;
   flex-direction: column;
   gap: 15px;

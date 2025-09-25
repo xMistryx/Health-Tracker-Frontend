@@ -1,0 +1,36 @@
+.form-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #aac9a056;
+  border-radius: 10px;
+}
+
+.exerciseform {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 5px;
+}
+
+.form-block input,
+select {
+  background-color: #e8e6e1;
+  color: #4f6b57;
+}
+
+.form-block input {
+  width: 100px;
+  padding: 6px 12px;
+}
+
+.dateinput {
+  height: 21px;
+}
+
+.exerciseselect,
+.formbutton {
+  height: 35px;
+}

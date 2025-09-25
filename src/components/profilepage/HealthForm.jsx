@@ -37,6 +37,7 @@ function HealthForm({ existingData, onSubmit }) {
     <form
       onSubmit={handleSubmit}
       style={{ maxWidth: "400px", margin: "0 auto" }}
+      className="ppform"
     >
       <h2>{existingData ? "Edit Health Info" : "Add Health Info"}</h2>
       {error && <p style={{ color: "red" }}>{error}</p>}
