@@ -13,7 +13,8 @@ import exerciseIcon from "../../assets/images/exercise1.webp";
 import foodIcon from "../../assets/images/food-icon.png";
 import homeIcon from "../../assets/images/home-icon.jpg";
 import manIcon from "../../assets/images/profile-icon.png";
-
+import progressIcon from "../../assets/images/progress-icon.jpg";
+import dashboardIcon from "../../assets/images/dashboard-icon.png";
 export default function ProfilePage() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
@@ -30,6 +31,9 @@ export default function ProfilePage() {
   const [exercise, setExercise] = useState(0);
   const [food, setFood] = useState(0);
   const dailyWaterGoal = 70; // oz
+  const dailySleepGoal = 480; // in minutes (8 hours)
+  const dailyExerciseGoal = 60; // in minutes
+  const dailyFoodGoal = 2000; // in calories
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -139,13 +143,15 @@ export default function ProfilePage() {
     <div className="profile-container">
       {/* Navigation inside container */}
       <div className="nav-desktop">
+        <span onClick={() => navigate("/")}>Home</span>
+
         <span onClick={() => navigate("/dashboard")}>Dashboard</span>
         <span onClick={() => navigate("/progress")}>Progress</span>
         <span
           onClick={() => {
             if (window.confirm("Do you want to sign out?")) {
               localStorage.removeItem("token");
-              navigate("/signin");
+              navigate("/");
             }
           }}
         >
@@ -220,21 +226,61 @@ export default function ProfilePage() {
             ></div>
           </div>
         </div>
+        <div className="stat-card">
+          <div className="stat-row">
+            <img src={sleepIcon} alt="Sleep" className="stat-icon" />
+            <span className="stat-value">
+              {sleep} / {dailySleepGoal} min
+            </span>
+            <small className="stat-date">{today}</small>
+          </div>
+          <div className="progress-bar-container">
+            <div
+              className="progress-bar-fill"
+              style={{
+                width: `${Math.min((sleep / dailySleepGoal) * 100, 100)}%`,
+              }}
+            ></div>
+          </div>
+        </div>
 
-        <div className="stat-row">
-          <img src={sleepIcon} alt="Sleep" />
-          <span>{sleep} min</span>
-          <small>{today}</small>
+        <div className="stat-card">
+          <div className="stat-row">
+            <img src={exerciseIcon} alt="Exercise" className="stat-icon" />
+            <span className="stat-value">
+              {exercise} / {dailyExerciseGoal} min
+            </span>
+            <small className="stat-date">{today}</small>
+          </div>
+          <div className="progress-bar-container">
+            <div
+              className="progress-bar-fill"
+              style={{
+                width: `${Math.min(
+                  (exercise / dailyExerciseGoal) * 100,
+                  100
+                )}%`,
+              }}
+            ></div>
+          </div>
         </div>
-        <div className="stat-row">
-          <img src={exerciseIcon} alt="Exercise" />
-          <span>{exercise} min</span>
-          <small>{today}</small>
-        </div>
-        <div className="stat-row">
-          <img src={foodIcon} alt="Food" />
-          <span>{food} cal</span>
-          <small>{today}</small>
+
+        <div className="stat-card">
+          <div className="stat-row">
+            <img src={foodIcon} alt="Food" className="stat-icon" />
+            <span className="stat-value">
+              {food} / {dailyFoodGoal} cal
+            </span>
+            <small className="stat-date">{today}</small>
+          </div>
+          <div className="progress-bar-container">
+            <div
+              className="progress-bar-fill"
+              style={{
+                width: `${Math.min((food / dailyFoodGoal) * 100, 100)}%`,
+              }}
+            ></div>
+          </div>
         </div>
       </div>
 
@@ -249,9 +295,14 @@ export default function ProfilePage() {
 
       {/* Mobile Nav */}
       <div className="nav-mobile">
-        <img src={homeIcon} alt="Home" onClick={() => navigate("/dashboard")} />
+        <img src={homeIcon} alt="Home" onClick={() => navigate("/")} />
         <img
-          src={exerciseIcon}
+          src={dashboardIcon}
+          alt="Dashboard"
+          onClick={() => navigate("/dashboard")}
+        />
+        <img
+          src={progressIcon}
           alt="Progress"
           onClick={() => navigate("/progress")}
         />
@@ -261,7 +312,7 @@ export default function ProfilePage() {
           onClick={() => {
             if (window.confirm("Do you want to sign out?")) {
               localStorage.removeItem("token");
-              navigate("/signin");
+              navigate("/");
             }
           }}
         />
