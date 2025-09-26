@@ -65,7 +65,9 @@ export default function WaterLogs({ date, userId }) {
         value={amount}
         onChange={(e) => setAmount(e.target.value)}
       />
-      <button onClick={handleAddWater}>Add</button>
+      <button className="submit-btn" onClick={handleAddWater}>
+        Add
+      </button>
 
       {/* Toast */}
       <EncouragementToast

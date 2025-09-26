@@ -39,9 +39,9 @@
   align-items: center;
   gap: 15px;
   padding: 12px 15px;
-  border: 1px solid #e0e0e0;
+
   border-radius: 8px;
-  background-color: #f9f9f9;
+  background-color: #b3c9b9;
 }
 
 /* Icons */
@@ -69,7 +69,7 @@
 .submit-btn {
   padding: 10px 25px;
   font-size: 1rem;
-  background-color: #0077cc;
+  background-color: #7a9f79;
   color: white;
   border: none;
   border-radius: 6px;
@@ -101,9 +101,8 @@
   align-items: center;
   gap: 15px;
   padding: 12px 15px;
-  border: 1px solid #e0e0e0;
   border-radius: 8px;
-  background-color: #f9f9f9;
+  background: #b3c9b9;
 }
 
 .food-log img {
@@ -122,7 +121,7 @@
 .submit-btn {
   padding: 10px 25px;
   font-size: 1rem;
-  background-color: #0077cc;
+  background-color: #7a9f79;
   color: white;
   border: none;
   border-radius: 6px;
@@ -143,4 +142,12 @@
   .food-log img {
     margin-bottom: 10px;
   }
+}
+input {
+  background-color: #f0f4f8;
+}
+input:focus {
+  border-color: #4ca1af; /* highlight on focus */
+  outline: none;
+  box-shadow: 0 0 5px rgba(76, 161, 175, 0.5);
 }

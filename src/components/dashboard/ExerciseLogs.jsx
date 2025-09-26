@@ -75,7 +75,9 @@ export default function ExerciseLogs({ date, userId }) {
         value={duration}
         onChange={(e) => setDuration(e.target.value)}
       />
-      <button onClick={handleAddExercise}>Add</button>
+      <button className="submit-btn" onClick={handleAddExercise}>
+        Add
+      </button>
 
       {/* Toast */}
       <EncouragementToast

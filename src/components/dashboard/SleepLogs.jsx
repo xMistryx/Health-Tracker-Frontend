@@ -82,7 +82,9 @@ export default function SleepLogs({ date, userId }) {
         value={endTime}
         onChange={(e) => setEndTime(e.target.value)}
       />
-      <button onClick={handleAddSleep}>Add Sleep</button>
+      <button className="submit-btn" onClick={handleAddSleep}>
+        Add Sleep
+      </button>
       {minutes > 0 && <p>Slept {minutes} minutes</p>}
 
       {/* Toast for latest milestone */}
