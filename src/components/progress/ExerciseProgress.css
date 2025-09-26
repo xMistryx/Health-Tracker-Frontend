@@ -1,111 +1,125 @@
-.progress-container {
-  display: flex;
+/* ExerciseProgress.css */
+
+/* General padding for the component */
+.p-6 {
+  padding: 1.5rem;
+  font-family: Arial, sans-serif;
 }
 
-.left-column {
+/* Dropdowns container */
+.filters {
+  display: flex;
+  gap: 1rem;
+}
+
+/* Dropdown styling */
+.dropdown {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  background-color: #fff;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+.dropdown:focus {
+  outline: none;
+  border-color: #6fa49c;
+  box-shadow: 0 0 0 2px rgba(111, 164, 156, 0.3);
+}
+
+/* Grid for exercise rows */
+.exercise-grid {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-right: 20px;
+  gap: 1rem;
 }
 
-.right-column {
-  flex: 1;
-}
-
-.btn {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 8px;
-  background: #e6e6e6;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-.btn:hover {
-  background: #ccc;
-}
-
-.btn-exercise {
-  background: #e6e6e6; /* same as other buttons */
-  color: black;
-}
-
-.range-buttons {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.btn-range {
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  background: white;
-  cursor: pointer;
-}
-
-.btn-range.active {
-  background: #4f6b57; /* Deep Moss */
-  color: white;
-  border-color: #4f6b57;
-}
-
+/* Each row representing a day */
 .exercise-row {
   display: flex;
   align-items: center;
-  margin-bottom: 12px;
-  padding: 6px;
-  border-radius: 6px;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e0e0e0;
 }
 
+/* Highlight today */
 .exercise-row.today {
-  background-color: rgba(168, 195, 160, 0.2); /* Sage Green tint */
+  background-color: #f0fdfd;
+  font-weight: bold;
 }
 
+/* Date label */
 .day-label {
-  width: 120px;
-  font-weight: 500;
+  width: 180px; /* fixed width for alignment */
+  font-size: 0.9rem;
+  color: #333;
 }
 
+/* Timeline container */
 .exercise-timeline {
   flex: 1;
   display: flex;
-  gap: 4px;
-  position: relative;
+  gap: 2px; /* space between exercise blocks */
+  height: 20px;
+  align-items: center;
 }
 
+/* Each exercise block */
 .exercise-block {
-  height: 24px;
+  flex: 1; /* equal width per block for now */
+  height: 100%;
+  background-color: #6fa49c; /* muted teal */
   border-radius: 4px;
 }
 
+/* Total minutes label */
 .total-minutes {
-  width: 80px;
+  width: 60px;
+  font-size: 0.9rem;
   text-align: right;
-  font-weight: bold;
-  color: #4f6b57; /* Deep Moss */
+  color: #555;
 }
-.btn-exercise.active {
-  background: #a8c3a0; /* Sage Green */
-  color: white;
-}
-.btn-sleep {
-  background: #e6e6e6;
-  color: black;
+.legend {
+  margin-top: 1rem;
 }
 
-.btn-sleep.active {
-  background: green;
-  color: white;
+.legend-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
-.btn-water {
-  background: #e6e6e6;
-  color: black;
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #333;
 }
 
-.btn-water.active {
-  background: #a8c3a0;
-  color: white;
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+.exercise-grid.month-view {
+  max-height: 500px; /* adjust based on design */
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  padding-right: 6px; /* space for scrollbar */
+}
+/* Responsive tweaks */
+@media (max-width: 600px) {
+  .day-label {
+    width: 120px;
+    font-size: 0.8rem;
+  }
+
+  .total-minutes {
+    width: 50px;
+    font-size: 0.8rem;
+  }
 }

@@ -1,9 +1,11 @@
 .dashboard-container {
   max-width: 900px;
-  height: 60%;
+  max-height: 70%;
   margin: 0 auto;
   padding: 20px;
   font-family: Arial, sans-serif;
+  background: #b3c9b9;
+  margin-top: -18%;
 }
 .landing-container {
   height: 100%;

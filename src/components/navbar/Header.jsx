@@ -1,9 +1,16 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
 import "./Header.css";
 
 export default function Header() {
-  const [showDropdown, setShowDropdown] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSignOut = () => {
+    if (window.confirm("Do you want to sign out?")) {
+      localStorage.removeItem("token");
+      navigate("/"); // goes back to home/sign-in page
+    }
+  };
 
   return (
     <nav className="navbar">
@@ -17,34 +24,13 @@ export default function Header() {
         <li>
           <Link to="/profile">Profile</Link>
         </li>
-
-        {/* Progress with Dropdown */}
-        <li
-          className="dropdown"
-          onMouseEnter={() => setShowDropdown(true)}
-          onMouseLeave={() => setShowDropdown(false)}
-        >
-          <span className="dropbtn">Progress ▾</span>
-          {showDropdown && (
-            <ul className="dropdown-content">
-              <li>
-                <Link to="/progress/water">Water</Link>
-              </li>
-              <li>
-                <Link to="/progress/sleep">Sleep</Link>
-              </li>
-              <li>
-                <Link to="/progress/exercise">Exercise</Link>
-              </li>
-              <li>
-                <Link to="/progress/food">Food</Link> {/* Added Food here */}
-              </li>
-            </ul>
-          )}
-        </li>
-
         <li>
-          <button className="signout-btn">Sign Out</button>
+          <Link to="/progress/water">Progress</Link>
+        </li>
+        <li>
+          <span className="signout-btn" onClick={handleSignOut}>
+            Sign Out
+          </span>
         </li>
       </ul>
     </nav>

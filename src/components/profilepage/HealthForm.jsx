@@ -15,7 +15,6 @@ export default function HealthForm({ token, onSubmit, existingData }) {
     e.preventDefault();
     setError(null);
 
-    // Validate required fields
     if (!height || !weight || !age || !biologicalSex || !gender) {
       setError("Please fill in all fields");
       return;
@@ -23,22 +22,38 @@ export default function HealthForm({ token, onSubmit, existingData }) {
 
     try {
       setLoading(true);
-      const res = await fetch("http://localhost:3000/api/health_info", {
-        method: "POST",
+
+      const payload = {
+        height: Number(height),
+        weight: Number(weight),
+        age: Number(age),
+        biologicalSex,
+        gender,
+      };
+
+      // If updating, include the id in the URL
+      const url = existingData
+        ? `http://localhost:3000/api/health_info/${existingData.id}`
+        : "http://localhost:3000/api/health_info";
+
+      const method = existingData ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ height, weight, age, biologicalSex, gender }),
+        body: JSON.stringify(payload),
       });
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Failed to save health info");
-      }
-
       const data = await res.json();
-      onSubmit(data); // send saved info to parent
+      console.log("Backend response:", data);
+
+      if (!res.ok) throw new Error(data.error || "Failed to save health info");
+
+      // Update parent state
+      onSubmit(data);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -48,11 +63,10 @@ export default function HealthForm({ token, onSubmit, existingData }) {
 
   return (
     <form
-      onSubmit={handleSubmit}
       style={{ maxWidth: "400px", margin: "0 auto" }}
+      onSubmit={handleSubmit}
     >
       <h2>{existingData ? "Edit Health Info" : "Add Health Info"}</h2>
-
       {error && <p style={{ color: "red" }}>{error}</p>}
 
       <label>

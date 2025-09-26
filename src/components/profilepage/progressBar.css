@@ -1,6 +1,6 @@
 .progress-bar-fill {
   height: 100%;
-  background-color: #6fa49c; /* muted teal */
+  background-color: #4f6b57; /* muted teal */
   border-radius: 6px;
   transition: width 0.3s ease-in-out;
 }

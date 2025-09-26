@@ -34,3 +34,32 @@
 .meal-block.intensity-5 {
   background: #754b3f;
 }
+.food-grid.month-view {
+  max-height: 500px;
+  display: flex;
+  flex-direction: column; /* horizontal layout */
+  overflow-x: auto;
+  gap: 12px;
+  padding-bottom: 4px; /* optional, to show scrollbar fully */
+}
+
+.food-row {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 8px;
+  border-radius: 6px;
+  min-width: 150px; /* ensures each day has a width */
+  background: #f8f8f8;
+}
+
+.food-row.today {
+  background: #a8c3a033; /* highlight today */
+}
+
+.meal-blocks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  width: 100%;
+}

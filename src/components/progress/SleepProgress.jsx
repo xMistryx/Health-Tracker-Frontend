@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import TipBox from "../tips/TipBox";
+import Header from "../navbar/Header.jsx";
 import "./SleepProgress.css";
 
-// Format date as "Sep 20, 2025"
 function formatDate(date) {
   return new Date(date).toLocaleDateString("en-US", {
     month: "short",
@@ -12,7 +12,6 @@ function formatDate(date) {
   });
 }
 
-// Format decimal hour to 12-hour AM/PM string
 function formatHour(hourDecimal) {
   const h = Math.floor(hourDecimal % 24);
   const m = Math.round((hourDecimal % 1) * 60);
@@ -21,7 +20,6 @@ function formatHour(hourDecimal) {
   return `${hour12}:${m.toString().padStart(2, "0")} ${ampm}`;
 }
 
-// Single day's row
 function SleepRow({ day, segments, isToday }) {
   const totalSleepHours = segments
     .reduce((sum, s) => sum + s.duration, 0)
@@ -60,10 +58,13 @@ function SleepRow({ day, segments, isToday }) {
   );
 }
 
-export default function SleepProgress() {
+export default function SleepProgress({ initialRange = "week" }) {
   const navigate = useNavigate();
-  const [range, setRange] = useState("week");
+  const [category, setCategory] = useState("Sleep");
+  const [range, setRange] = useState(initialRange);
   const [sleepLogs, setSleepLogs] = useState([]);
+
+  const todayStr = new Date().toLocaleDateString("en-CA");
 
   useEffect(() => {
     async function fetchSleep() {
@@ -81,111 +82,93 @@ export default function SleepProgress() {
     fetchSleep();
   }, []);
 
-  const todayStr = new Date().toLocaleDateString("en-CA");
+  const rangeLengths = { today: 1, yesterday: 1, week: 7, month: 30 };
+  const length = rangeLengths[range] || 7;
 
-  // Prepare rows for selected range
-  const days = [];
-  let length = 7;
-  if (range === "today") length = 1;
-  else if (range === "yesterday") length = 1;
-  else if (range === "month") length = 30;
-
-  for (let i = 0; i < length; i++) {
+  const days = Array.from({ length }, (_, i) => {
     const d = new Date();
     if (range === "yesterday") d.setDate(d.getDate() - 1);
     else if (range === "week" || range === "month")
       d.setDate(d.getDate() - (length - 1 - i));
 
-    const dateStr = d.toLocaleDateString("en-CA"); // ✅ local YYYY-MM-DD
+    const dateStr = d.toLocaleDateString("en-CA");
 
-    // Only include logs starting on this local date
     const segments = sleepLogs
-      .filter((log) => {
-        const logDate = new Date(log.date);
-        const logDateStr = logDate.toLocaleDateString("en-CA"); // ✅ local
-        return logDateStr === dateStr;
-      })
+      .filter(
+        (log) => new Date(log.date).toLocaleDateString("en-CA") === dateStr
+      )
       .map((log) => {
         const [startH, startM] = log.start_time.split(":").map(Number);
         const [endH, endM] = log.end_time.split(":").map(Number);
-
         let startHour = startH + startM / 60;
         let endHour = endH + endM / 60;
         if (endHour <= startHour) endHour += 24; // overnight
-
         return {
           start: startHour,
           end: endHour,
           type: log.sleep_type,
-          duration:
-            endHour - startHour < 0
-              ? endHour - startHour + 24
-              : endHour - startHour,
+          duration: endHour - startHour,
         };
       });
 
-    days.push({ day: d, segments });
-  }
+    return { day: d, segments };
+  });
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Sleep Progress</h1>
-      <div className="progress-container">
-        <div className="left-column">
-          <button onClick={() => navigate("/dashboard")} className="btn">
-            ⬅ Back to Dashboard
-          </button>
-          <button
-            onClick={() => navigate("/progress/water")}
-            className="btn btn-water"
-          >
-            Water
-          </button>
-          <button className="btn btn-sleep">Sleep</button>
-          <button
-            onClick={() => navigate("/progress/exercise")}
-            className="btn btn-exercise"
-          >
-            Exercise
-          </button>
-          <button
-            onClick={() => navigate("/progress/food")}
-            className="btn btn-food"
-          >
-            Food
-          </button>
-        </div>
+      <Header />
+      <h1 className="text-2xl font-bold mb-4">{category} Progress</h1>
 
-        <div className="right-column">
-          <div className="range-buttons">
-            {["today", "yesterday", "week", "month"].map((r) => (
-              <button
-                key={r}
-                onClick={() => setRange(r)}
-                className={range === r ? "btn-range active" : "btn-range"}
-              >
-                {r === "week"
-                  ? "1 Week"
-                  : r.charAt(0).toUpperCase() + r.slice(1)}
-              </button>
-            ))}
-          </div>
+      {/* Dropdowns */}
+      <div className="filters mb-4 flex gap-4">
+        <select
+          className="dropdown"
+          value={category}
+          onChange={(e) => {
+            const cat = e.target.value;
+            setCategory(cat);
+            if (cat === "Water") navigate("/progress/water");
+            else if (cat === "Sleep") navigate("/progress/sleep");
+            else if (cat === "Exercise") navigate("/progress/exercise");
+            else if (cat === "Food") navigate("/progress/food");
+          }}
+        >
+          {["Water", "Sleep", "Exercise", "Food"].map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
 
-          <div className="sleep-grid mt-4">
-            {days.map((d, idx) => (
-              <SleepRow
-                key={idx}
-                day={d.day}
-                segments={d.segments}
-                isToday={d.day.toLocaleDateString("en-CA") === todayStr}
-              />
-            ))}
-          </div>
+        <select
+          className="dropdown"
+          value={range}
+          onChange={(e) => setRange(e.target.value)}
+        >
+          {["today", "yesterday", "week", "month"].map((r) => (
+            <option key={r} value={r}>
+              {r === "week" ? "1 Week" : r.charAt(0).toUpperCase() + r.slice(1)}
+            </option>
+          ))}
+        </select>
+      </div>
 
-          <div className="mt-6">
-            <TipBox category="Sleep" />
-          </div>
-        </div>
+      {/* Sleep grid */}
+      <div
+        className={`sleep-grid ${range === "month" ? "month-view" : ""} mt-4`}
+      >
+        {days.map((d, idx) => (
+          <SleepRow
+            key={idx}
+            day={d.day}
+            segments={d.segments}
+            isToday={d.day.toLocaleDateString("en-CA") === todayStr}
+          />
+        ))}
+      </div>
+
+      <div className="mt-6">
+        <TipBox category="Sleep" />
       </div>
     </div>
   );

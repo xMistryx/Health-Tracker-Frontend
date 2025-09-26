@@ -1,174 +1,160 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
 import TipBox from "../tips/TipBox";
+import { useNavigate } from "react-router-dom";
+import Header from "../navbar/Header.jsx";
 import "./ExerciseProgress.css";
 
-// Map exercise types exactly to DB values
-const typeColors = {
-  Cardio: "#A8C3A0",
-  "Strength Training": "#D9A48F",
-  "Flexibility Training": "#6FA49C",
-  "Balance Training": "#4B7A74",
-  Stretching: "#B3735D",
-};
-
-function ExerciseRow({ day, exercises, isToday }) {
-  const totalMinutes = exercises.reduce((sum, e) => sum + e.duration, 0);
-
-  return (
-    <div className={`exercise-row ${isToday ? "today" : ""}`}>
-      <span className="day-label">
-        {day.toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-        })}
-      </span>
-
-      <div className="exercise-timeline">
-        {exercises.map((ex, idx) => (
-          <div
-            key={idx}
-            className="exercise-block"
-            style={{
-              backgroundColor: typeColors[ex.type] || "#ccc",
-              width: `${ex.duration}px`, // 1 min = 1px (adjust scale if needed)
-            }}
-            title={`${ex.type} - ${ex.duration} min`}
-          />
-        ))}
-      </div>
-
-      <span className="total-minutes">{totalMinutes} min</span>
-    </div>
-  );
-}
-
-export default function ExerciseProgress() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [range, setRange] = useState("week");
+export default function ExerciseProgress({ range: initialRange = "week" }) {
+  const [category, setCategory] = useState("Exercise");
+  const [range, setRange] = useState(initialRange);
   const [exerciseLogs, setExerciseLogs] = useState([]);
+  const navigate = useNavigate();
 
-  // Fetch logs from correct backend route
+  // ✅ Color mapping for exercise types
+  const typeColors = {
+    Cardio: "#A8C3A0",
+    "Strength Training": "#D9A48F",
+    "Flexibility Training": "#6FA49C",
+    "Balance Training": "#4B7A74",
+    Stretching: "#B3735D",
+  };
+
   useEffect(() => {
-    async function fetchExercises() {
+    async function fetchLogs() {
       try {
         const res = await fetch("http://localhost:3000/api/exercise_logs", {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
         if (!res.ok) throw new Error("Failed to fetch exercise logs");
         const data = await res.json();
-        setExerciseLogs(data);
+
+        // ✅ Normalize: add "activity" so we can use it consistently
+        const normalized = data.map((log) => ({
+          ...log,
+          activity: log.exercise_type, // <-- add alias
+        }));
+
+        setExerciseLogs(normalized);
       } catch (err) {
         console.error(err);
       }
     }
-    fetchExercises();
+    fetchLogs();
   }, []);
 
+  // Prepare display data
   const todayStr = new Date().toISOString().split("T")[0];
+  const rangeLengths = { today: 1, yesterday: 1, week: 7, month: 30 };
+  const length = rangeLengths[range] || 7;
 
-  const days = [];
-  let length = range === "month" ? 30 : range === "week" ? 7 : 1;
-  for (let i = 0; i < length; i++) {
+  const data = Array.from({ length }, (_, i) => {
     const d = new Date();
     if (range === "yesterday") d.setDate(d.getDate() - 1);
-    else if (range === "week" || range === "month") {
+    else if (range === "week" || range === "month")
       d.setDate(d.getDate() - (length - 1 - i));
-    }
 
     const dateStr = d.toISOString().split("T")[0];
+    const logs = exerciseLogs.filter((l) => l.date.split("T")[0] === dateStr);
+    const totalMinutes = logs.reduce((sum, l) => sum + l.duration, 0);
 
-    const exercises = exerciseLogs
-      .filter(
-        (log) => new Date(log.date).toISOString().split("T")[0] === dateStr
-      )
-      .map((log) => ({
-        type: log.exercise_type,
-        duration: log.duration,
-      }));
-
-    days.push({ day: d, exercises });
-  }
+    return {
+      dateStr,
+      label: d.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }),
+      logs,
+      totalMinutes,
+    };
+  });
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Exercise Progress</h1>
-      <div className="progress-container">
-        {/* LEFT COLUMN NAVIGATION */}
-        <div className="left-column">
-          <button
-            onClick={() => navigate("/dashboard")}
-            className={`btn ${
-              location.pathname === "/dashboard" ? "active" : ""
-            }`}
-          >
-            ⬅ Back to Dashboard
-          </button>
-          <button
-            onClick={() => navigate("/progress/water")}
-            className={`btn btn-water ${
-              location.pathname === "/progress/water" ? "active" : ""
-            }`}
-          >
-            Water
-          </button>
-          <button
-            onClick={() => navigate("/progress/sleep")}
-            className={`btn btn-sleep ${
-              location.pathname === "/progress/sleep" ? "active" : ""
-            }`}
-          >
-            Sleep
-          </button>
-          <button
-            onClick={() => navigate("/progress/exercise")}
-            className={`btn btn-exercise ${
-              location.pathname === "/progress/exercise" ? "active" : ""
-            }`}
-          >
-            Exercise
-          </button>
-          <button
-            onClick={() => navigate("/progress/food")}
-            className="btn btn-food"
-          >
-            Food
-          </button>
-        </div>
+      <Header />
+      <h1 className="text-2xl font-bold mb-4">{category} Progress</h1>
 
-        {/* RIGHT COLUMN CONTENT */}
-        <div className="right-column">
-          <div className="range-buttons">
-            {["today", "yesterday", "week", "month"].map((r) => (
-              <button
-                key={r}
-                onClick={() => setRange(r)}
-                className={`btn-range ${range === r ? "active" : ""}`}
-              >
-                {r === "week"
-                  ? "1 Week"
-                  : r.charAt(0).toUpperCase() + r.slice(1)}
-              </button>
-            ))}
-          </div>
+      {/* Dropdowns below heading */}
+      <div className="filters mb-4 flex gap-4">
+        <select
+          className="dropdown"
+          value={category}
+          onChange={(e) => {
+            const cat = e.target.value;
+            setCategory(cat);
 
-          <div className="exercise-grid mt-4">
-            {days.map((d, idx) => (
-              <ExerciseRow
-                key={idx}
-                day={d.day}
-                exercises={d.exercises}
-                isToday={d.day.toISOString().split("T")[0] === todayStr}
-              />
-            ))}
-          </div>
+            // Navigate to the corresponding page
+            if (cat === "Water") navigate("/progress/water");
+            else if (cat === "Sleep") navigate("/progress/sleep");
+            else if (cat === "Exercise") navigate("/progress/exercise");
+            else if (cat === "Food") navigate("/progress/food");
+          }}
+        >
+          {["Water", "Sleep", "Exercise", "Food"].map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
 
-          <div className="mt-6">
-            <TipBox category="Exercise" />
+        <select
+          className="dropdown"
+          value={range}
+          onChange={(e) => setRange(e.target.value)}
+        >
+          {["today", "yesterday", "week", "month"].map((r) => (
+            <option key={r} value={r}>
+              {r === "week" ? "1 Week" : r.charAt(0).toUpperCase() + r.slice(1)}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Exercise data rows */}
+      <div className={`exercise-grid ${range === "month" ? "month-view" : ""}`}>
+        {data.map((d) => (
+          <div
+            key={d.dateStr}
+            className={`exercise-row ${d.dateStr === todayStr ? "today" : ""}`}
+          >
+            <span className="day-label">{d.label}</span>
+            <div className="exercise-timeline">
+              {d.logs.map((l, i) => (
+                <div
+                  key={i}
+                  className="exercise-block"
+                  style={{
+                    flex: l.duration,
+                    backgroundColor: typeColors[l.activity] || "#6fa49c", // ✅ use activity
+                  }}
+                  title={`${l.activity} - ${l.duration} min`} // ✅ tooltip fixed
+                />
+              ))}
+            </div>
+            <span className="total-minutes">{d.totalMinutes} min</span>
           </div>
-        </div>
+        ))}
+      </div>
+
+      {/* Legend for exercise types */}
+      <div className="legend mt-4 flex flex-wrap gap-4">
+        {Object.entries(typeColors).map(([type, color]) => (
+          <div key={type} className="legend-item flex items-center gap-2">
+            <div
+              className="legend-color-box"
+              style={{
+                width: "16px",
+                height: "16px",
+                backgroundColor: color,
+              }}
+            />
+            <span>{type}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-6">
+        <TipBox category={category} />
       </div>
     </div>
   );

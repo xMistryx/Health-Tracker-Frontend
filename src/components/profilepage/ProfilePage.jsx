@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ProfilePage.css";
 import HealthForm from "./HealthForm";
+import Header from "../navbar/Header";
 import "./ProgressBar.css";
 
 import girlIcon from "../../assets/images/girl.jpg";
@@ -15,6 +16,7 @@ import homeIcon from "../../assets/images/home-icon.jpg";
 import manIcon from "../../assets/images/profile-icon.png";
 import progressIcon from "../../assets/images/progress-icon.jpg";
 import dashboardIcon from "../../assets/images/dashboard-icon.png";
+
 export default function ProfilePage() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
@@ -22,112 +24,120 @@ export default function ProfilePage() {
   const [healthInfo, setHealthInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [editing, setEditing] = useState(false);
+  const [editing, setEditing] = useState(() => {
+    return JSON.parse(localStorage.getItem("editing")) || false;
+  });
   const [profileImage, setProfileImage] = useState(girlIcon);
 
-  // new states for daily totals
   const [water, setWater] = useState(0);
   const [sleep, setSleep] = useState(0);
   const [exercise, setExercise] = useState(0);
   const [food, setFood] = useState(0);
-  const dailyWaterGoal = 70; // oz
-  const dailySleepGoal = 480; // in minutes (8 hours)
-  const dailyExerciseGoal = 60; // in minutes
-  const dailyFoodGoal = 2000; // in calories
+
+  const dailyGoals = {
+    water: 70,
+    sleep: 480,
+    exercise: 60,
+    food: 2000,
+  };
 
   const today = new Date().toISOString().split("T")[0];
 
+  const handleSignOut = () => {
+    if (window.confirm("Do you want to sign out?")) {
+      localStorage.removeItem("token");
+      navigate("/");
+    }
+  };
+
   useEffect(() => {
     let isMounted = true;
-
-    async function fetchHealthInfo() {
+    const fetchHealthInfo = async () => {
       try {
         const res = await fetch("http://localhost:3000/api/health_info", {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!isMounted) return;
         if (res.status === 401) throw new Error("Unauthorized. Please log in.");
+
         const data = await res.json();
-        if (isMounted) setHealthInfo(data.length ? data[0] : null);
+
+        // If no record exists, initialize with empty fields
+        if (isMounted) {
+          setHealthInfo(
+            data.length
+              ? data[0]
+              : {
+                  first_name: "",
+                  last_name: "",
+                  height: "",
+                  weight: "",
+                  age: "",
+                  biological_sex: "",
+                  gender: "",
+                  id: null, // will be null for new record
+                }
+          );
+        }
       } catch (err) {
         if (isMounted) setError(err.message);
       } finally {
         if (isMounted) setLoading(false);
       }
-    }
+    };
 
-    async function fetchWater() {
+    const fetchStat = async (url, setter, key) => {
       try {
-        const res = await fetch("http://localhost:3000/api/water", {
+        const res = await fetch(url, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        if (!res.ok) throw new Error("Failed to fetch water logs");
-
+        if (!res.ok) throw new Error(`Failed to fetch ${key}`);
         const entries = await res.json();
-        console.log("Water entries:", entries); // 👀 debug
-
-        const today = new Date().toISOString().split("T")[0];
-
-        setWater(entries[0].total_oz);
+        setter(entries[0]?.[key] || 0);
       } catch (err) {
-        console.error("Error fetching water:", err);
+        console.error(`Error fetching ${key}:`, err);
+        setter(0);
       }
-    }
-    async function fetchSleep() {
-      try {
-        const res = await fetch("http://localhost:3000/api/sleep", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const entries = await res.json();
-        console.log("Sleep entries:", entries);
+    };
 
-        setSleep(entries[0].duration);
-      } catch (err) {
-        console.error("Error fetching sleep:", err);
-      }
-    }
-
-    async function fetchExercise() {
-      try {
-        const res = await fetch("http://localhost:3000/api/exercise_logs", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const entries = await res.json();
-        const total = entries;
-        console.log("Exercise entries:", entries);
-        setExercise(entries[0].duration);
-      } catch (err) {
-        console.error("Error fetching exercise:", err);
-      }
-    }
-
-    async function fetchFood() {
-      try {
-        const res = await fetch("http://localhost:3000/api/food_logs", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const entries = await res.json();
-        const total = entries;
-        console.log("Food entries:", entries);
-        setFood(entries[0].calories);
-      } catch (err) {
-        console.error("Error fetching food:", err);
-      }
-    }
-
+    // Fetch all stats
     fetchHealthInfo();
-    fetchWater();
-    fetchSleep();
-    fetchExercise();
-    fetchFood();
+    const stats = [
+      {
+        url: "http://localhost:3000/api/water",
+        setter: setWater,
+        key: "total_oz",
+      },
+      {
+        url: "http://localhost:3000/api/sleep",
+        setter: setSleep,
+        key: "duration",
+      },
+      {
+        url: "http://localhost:3000/api/exercise_logs",
+        setter: setExercise,
+        key: "duration",
+      },
+      {
+        url: "http://localhost:3000/api/food_logs",
+        setter: setFood,
+        key: "calories",
+      },
+    ];
+    stats.forEach((stat) => fetchStat(stat.url, stat.setter, stat.key));
 
     return () => {
       isMounted = false;
     };
-  }, [token, today]);
+  }, [token]);
 
-  const handleFormSubmit = (newInfo) => {
-    setHealthInfo(newInfo);
+  const handleFormSubmit = (updatedData) => {
+    console.log("Profile updated with:", updatedData);
+    setHealthInfo((prev) => ({
+      ...prev,
+      ...updatedData,
+      biological_sex: updatedData.biologicalSex || prev.biological_sex,
+    }));
     setEditing(false);
   };
 
@@ -141,25 +151,8 @@ export default function ProfilePage() {
 
   return (
     <div className="profile-container">
-      {/* Navigation inside container */}
-      <div className="nav-desktop">
-        <span onClick={() => navigate("/")}>Home</span>
+      <Header />
 
-        <span onClick={() => navigate("/dashboard")}>Dashboard</span>
-        <span onClick={() => navigate("/progress")}>Progress</span>
-        <span
-          onClick={() => {
-            if (window.confirm("Do you want to sign out?")) {
-              localStorage.removeItem("token");
-              navigate("/");
-            }
-          }}
-        >
-          Sign Out
-        </span>
-      </div>
-
-      {/* Profile Header */}
       <div className="profile-header">
         <div className="profile-image-wrapper">
           <img src={profileImage} alt="Profile" className="profile-image" />
@@ -182,15 +175,12 @@ export default function ProfilePage() {
             />
           )}
         </div>
-
-        {/* Name */}
         <div className="username">
           <div>{healthInfo?.first_name || "First"}</div>
           <div>{healthInfo?.last_name || "Last"}</div>
         </div>
       </div>
 
-      {/* Age/Height/Weight */}
       <div className="profile-stats-table">
         <div className="labels-row">
           <span>Age</span>
@@ -204,87 +194,43 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* Stats Cards */}
       <div className="stats-column">
-        <div className="stat-card">
-          {/* First row: icon, value, date */}
-          <div className="stat-row">
-            <img src={waterIcon} alt="Water" className="stat-icon" />
-            <span className="stat-value">
-              {water}/{dailyWaterGoal} oz
-            </span>
-            <small className="stat-date">{today}</small>
+        {[
+          { icon: waterIcon, value: water, goal: dailyGoals.water, unit: "oz" },
+          {
+            icon: sleepIcon,
+            value: sleep,
+            goal: dailyGoals.sleep,
+            unit: "min",
+          },
+          {
+            icon: exerciseIcon,
+            value: exercise,
+            goal: dailyGoals.exercise,
+            unit: "min",
+          },
+          { icon: foodIcon, value: food, goal: dailyGoals.food, unit: "cal" },
+        ].map((stat, idx) => (
+          <div key={idx} className="stat-card">
+            <div className="stat-row">
+              <img src={stat.icon} alt="" className="stat-icon" />
+              <span className="stat-value">
+                {stat.value} / {stat.goal} {stat.unit}
+              </span>
+              <small className="stat-date">{today}</small>
+            </div>
+            <div className="progress-bar-container">
+              <div
+                className="progress-bar-fill"
+                style={{
+                  width: `${Math.min((stat.value / stat.goal) * 100, 100)}%`,
+                }}
+              />
+            </div>
           </div>
-
-          {/* Second row: progress bar */}
-          <div className="progress-bar-container">
-            <div
-              className="progress-bar-fill"
-              style={{
-                width: `${Math.min((water / dailyWaterGoal) * 100, 100)}%`,
-              }}
-            ></div>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-row">
-            <img src={sleepIcon} alt="Sleep" className="stat-icon" />
-            <span className="stat-value">
-              {sleep} / {dailySleepGoal} min
-            </span>
-            <small className="stat-date">{today}</small>
-          </div>
-          <div className="progress-bar-container">
-            <div
-              className="progress-bar-fill"
-              style={{
-                width: `${Math.min((sleep / dailySleepGoal) * 100, 100)}%`,
-              }}
-            ></div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-row">
-            <img src={exerciseIcon} alt="Exercise" className="stat-icon" />
-            <span className="stat-value">
-              {exercise} / {dailyExerciseGoal} min
-            </span>
-            <small className="stat-date">{today}</small>
-          </div>
-          <div className="progress-bar-container">
-            <div
-              className="progress-bar-fill"
-              style={{
-                width: `${Math.min(
-                  (exercise / dailyExerciseGoal) * 100,
-                  100
-                )}%`,
-              }}
-            ></div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-row">
-            <img src={foodIcon} alt="Food" className="stat-icon" />
-            <span className="stat-value">
-              {food} / {dailyFoodGoal} cal
-            </span>
-            <small className="stat-date">{today}</small>
-          </div>
-          <div className="progress-bar-container">
-            <div
-              className="progress-bar-fill"
-              style={{
-                width: `${Math.min((food / dailyFoodGoal) * 100, 100)}%`,
-              }}
-            ></div>
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* Health Form */}
       {editing && (
         <HealthForm
           token={token}
@@ -293,7 +239,6 @@ export default function ProfilePage() {
         />
       )}
 
-      {/* Mobile Nav */}
       <div className="nav-mobile">
         <img src={homeIcon} alt="Home" onClick={() => navigate("/")} />
         <img
@@ -304,18 +249,9 @@ export default function ProfilePage() {
         <img
           src={progressIcon}
           alt="Progress"
-          onClick={() => navigate("/progress")}
+          onClick={() => navigate("/progress/water")}
         />
-        <img
-          src={manIcon}
-          alt="Sign Out"
-          onClick={() => {
-            if (window.confirm("Do you want to sign out?")) {
-              localStorage.removeItem("token");
-              navigate("/");
-            }
-          }}
-        />
+        <img src={manIcon} alt="Sign Out" onClick={handleSignOut} />
       </div>
     </div>
   );

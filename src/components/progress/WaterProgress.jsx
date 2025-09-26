@@ -1,11 +1,10 @@
-// src/components/progress/WaterProgress.jsx
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import TipBox from "../tips/TipBox";
 import { WaterContext } from "../../context/WaterContext";
+import Header from "../navbar/Header.jsx";
 import "./Progress.css";
 
-// Format date to "Sep 21, 2025"
 function formatDate(date) {
   return new Date(date).toLocaleDateString("en-US", {
     month: "short",
@@ -14,7 +13,6 @@ function formatDate(date) {
   });
 }
 
-// Visual row for a single day
 function DropletRow({ label, oz, isToday }) {
   const droplets = Math.floor(oz / 8);
   const half = oz % 8 >= 4;
@@ -43,49 +41,45 @@ function DropletRow({ label, oz, isToday }) {
   );
 }
 
-export default function WaterProgress() {
+export default function WaterProgress({ range: initialRange = "week" }) {
   const navigate = useNavigate();
-  const [range, setRange] = useState("week");
-  const [waterLogs, setWaterLogs] = useState([]); // aggregated {date, total_oz}
+  const [category, setCategory] = useState("Water");
+  const [range, setRange] = useState(initialRange);
+  const [waterLogs, setWaterLogs] = useState([]);
   const { todayOz, setTodayOz } = useContext(WaterContext) || {};
 
-  // Fetch and aggregate water logs from backend
   useEffect(() => {
-    async function fetchAndAggregate() {
+    async function fetchWaterLogs() {
       try {
         const res = await fetch("http://localhost:3000/api/water", {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
         if (!res.ok) throw new Error("Failed to fetch water logs");
 
-        const raw = await res.json(); // [{date, total_oz}, ...]
-        // normalize date and convert oz to number
+        const raw = await res.json();
         const aggregated = raw
           .map((row) => ({
-            date: row.date.split("T")[0], // remove time
+            date: row.date.split("T")[0],
             total_oz: Number(row.total_oz),
           }))
           .sort((a, b) => new Date(a.date) - new Date(b.date));
 
         setWaterLogs(aggregated);
 
-        // Update today's context
         const todayStr = new Date().toISOString().split("T")[0];
         const todaySum =
           aggregated.find((l) => l.date === todayStr)?.total_oz || 0;
         if (typeof setTodayOz === "function") setTodayOz(todaySum);
       } catch (err) {
-        console.error("fetchAndAggregate error:", err);
+        console.error(err);
       }
     }
 
-    fetchAndAggregate();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    fetchWaterLogs();
+  }, [setTodayOz]);
 
   const todayStr = new Date().toISOString().split("T")[0];
 
-  // Fill missing days for week/month
   function fillMissingDates(logs, length) {
     const result = [];
     for (let i = 0; i < length; i++) {
@@ -103,12 +97,11 @@ export default function WaterProgress() {
     return result;
   }
 
-  // Determine data to display
   let data = [];
   if (range === "today") {
     const found = waterLogs.find((l) => l.date === todayStr);
-    const initialOz = found ? Number(found.total_oz) : 0;
-    const finalOz = typeof todayOz === "number" ? todayOz : initialOz;
+    const finalOz =
+      typeof todayOz === "number" ? todayOz : found?.total_oz || 0;
     data = [{ date: todayStr, label: formatDate(todayStr), oz: finalOz }];
   } else if (range === "yesterday") {
     const y = new Date();
@@ -119,7 +112,7 @@ export default function WaterProgress() {
       {
         date: dateStr,
         label: formatDate(dateStr),
-        oz: found ? Number(found.total_oz) : 0,
+        oz: found ? found.total_oz : 0,
       },
     ];
   } else if (range === "week") {
@@ -148,85 +141,76 @@ export default function WaterProgress() {
   else if (range === "month")
     summary = `In the last 30 days you drank ${total} oz (avg ${avg} oz/day).`;
 
+  // Navigate on category change
+  const handleCategoryChange = (e) => {
+    const cat = e.target.value;
+    setCategory(cat);
+    if (cat === "Water") navigate("/progress/water");
+    else if (cat === "Sleep") navigate("/progress/sleep");
+    else if (cat === "Exercise") navigate("/progress/exercise");
+    else if (cat === "Food") navigate("/progress/food");
+  };
+
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Water Progress</h1>
-      <div className="progress-container">
-        {/* Left navigation */}
-        <div className="left-column">
-          <button onClick={() => navigate("/dashboard")} className="btn">
-            ⬅ Back to Dashboard
-          </button>
-          <button
-            onClick={() => navigate("/progress/water")}
-            className="btn btn-water"
-          >
-            Water
-          </button>
-          <button
-            onClick={() => navigate("/progress/sleep")}
-            className="btn btn-sleep"
-          >
-            Sleep
-          </button>
-          <button
-            onClick={() => navigate("/progress/exercise")}
-            className="btn btn-exercise"
-          >
-            Exercise
-          </button>
-          <button
-            onClick={() => navigate("/progress/food")}
-            className="btn btn-food"
-          >
-            Food
-          </button>
+      <Header />
+      <h1 className="text-2xl font-bold mb-4">{category} Progress</h1>
+
+      {/* Dropdowns */}
+      <div className="filters mb-4 flex gap-4">
+        <select
+          className="dropdown"
+          value={category}
+          onChange={handleCategoryChange}
+        >
+          {["Water", "Sleep", "Exercise", "Food"].map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
+
+        <select
+          className="dropdown"
+          value={range}
+          onChange={(e) => setRange(e.target.value)}
+        >
+          {["today", "yesterday", "week", "month"].map((r) => (
+            <option key={r} value={r}>
+              {r === "week" ? "1 Week" : r.charAt(0).toUpperCase() + r.slice(1)}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Summary */}
+      <p className="font-bold mb-4">{summary}</p>
+
+      {/* Droplet rows */}
+      <div className={`droplet-grid ${range === "month" ? "month-view" : ""}`}>
+        {data.map((d) => (
+          <DropletRow
+            key={d.date}
+            label={d.label}
+            oz={d.oz}
+            isToday={d.date === todayStr}
+          />
+        ))}
+      </div>
+
+      {(range === "week" || range === "month") && (
+        <div className="mt-4">
+          <p>
+            <strong>Total:</strong> {total} oz
+          </p>
+          <p>
+            <strong>Average:</strong> {avg} oz
+          </p>
         </div>
+      )}
 
-        {/* Right content */}
-        <div className="right-column">
-          <div className="range-buttons">
-            {["today", "yesterday", "week", "month"].map((r) => (
-              <button
-                key={r}
-                onClick={() => setRange(r)}
-                className={range === r ? "btn-range active" : "btn-range"}
-              >
-                {r === "week"
-                  ? "1 Week"
-                  : r.charAt(0).toUpperCase() + r.slice(1)}
-              </button>
-            ))}
-          </div>
-
-          <p className="font-bold mb-4">{summary}</p>
-
-          <div className="droplet-grid">
-            {data.map((d) => (
-              <DropletRow
-                key={d.date}
-                label={d.label}
-                oz={d.oz}
-                isToday={d.date === todayStr}
-              />
-            ))}
-          </div>
-
-          {(range === "week" || range === "month") && (
-            <div className="mt-4">
-              <p>
-                <strong>Total:</strong> {total} oz
-              </p>
-              <p>
-                <strong>Average:</strong> {avg} oz
-              </p>
-            </div>
-          )}
-
-          <div className="mt-6">
-            <TipBox category="Water" />
-          </div>
-        </div>
+      <div className="mt-6">
+        <TipBox category="Water" />
       </div>
     </div>
   );

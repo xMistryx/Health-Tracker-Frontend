@@ -1,10 +1,9 @@
-// src/components/progress/FoodProgress.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import TipBox from "../tips/TipBox";
+import Header from "../navbar/Header.jsx";
 import "./FoodProgress.css";
 
-// Format date as "Sep 21, 2025"
 function formatDate(date) {
   return new Date(date).toLocaleDateString("en-US", {
     month: "short",
@@ -13,9 +12,8 @@ function formatDate(date) {
   });
 }
 
-// Determine block intensity based on calories
 const getIntensityClass = (calories) => {
-  if (!calories) return "intensity-1"; // handle missing calories
+  if (!calories) return "intensity-1";
   if (calories >= 500) return "intensity-5";
   if (calories >= 400) return "intensity-4";
   if (calories >= 300) return "intensity-3";
@@ -23,7 +21,6 @@ const getIntensityClass = (calories) => {
   return "intensity-1";
 };
 
-// Visual row for a single day
 function FoodRow({ label, meals, isToday }) {
   const totalCalories = meals.reduce(
     (sum, m) => sum + Number(m.calories || 0),
@@ -44,12 +41,7 @@ function FoodRow({ label, meals, isToday }) {
         {meals.length === 0 ? (
           <span
             className="empty"
-            title={`No meals logged today.
-Total Calories: 0
-Protein: 0g
-Carbs: 0g
-Fat: 0g
-Fiber: 0g`}
+            title={`No meals logged today.\nTotal Calories: 0\nProtein: 0g\nCarbs: 0g\nFat: 0g\nFiber: 0g`}
           >
             No meals
           </span>
@@ -58,12 +50,11 @@ Fiber: 0g`}
             <div
               key={i}
               className={`meal-block ${getIntensityClass(meal.calories)}`}
-              title={`Food: ${meal.food_item}
-Calories: ${meal.calories} cal
-Protein: ${meal.protein} g
-Carbs: ${meal.carbs} g
-Fat: ${meal.fat} g
-Fiber: ${meal.fiber || 0} g`}
+              title={`Food: ${meal.food_item}\nCalories: ${
+                meal.calories
+              } cal\nProtein: ${meal.protein} g\nCarbs: ${meal.carbs} g\nFat: ${
+                meal.fat
+              } g\nFiber: ${meal.fiber || 0} g`}
             >
               {meal.food_item}
             </div>
@@ -72,12 +63,7 @@ Fiber: ${meal.fiber || 0} g`}
       </div>
       <span
         className="day-total"
-        title={`Total Intake:
-Calories: ${totalCalories} cal
-Protein: ${totalProtein} g
-Carbs: ${totalCarbs} g
-Fat: ${totalFat} g
-Fiber: ${totalFiber} g`}
+        title={`Total Intake:\nCalories: ${totalCalories} cal\nProtein: ${totalProtein} g\nCarbs: ${totalCarbs} g\nFat: ${totalFat} g\nFiber: ${totalFiber} g`}
       >
         {meals.length} meals
       </span>
@@ -85,12 +71,14 @@ Fiber: ${totalFiber} g`}
   );
 }
 
-export default function FoodProgress() {
+export default function FoodProgress({ initialRange = "week" }) {
   const navigate = useNavigate();
-  const [range, setRange] = useState("week");
-  const [foodLogs, setFoodLogs] = useState({}); // grouped by date
+  const [category, setCategory] = useState("Food");
+  const [range, setRange] = useState(initialRange);
+  const [foodLogs, setFoodLogs] = useState({});
 
-  // Fetch logs
+  const todayStr = new Date().toISOString().split("T")[0];
+
   useEffect(() => {
     async function fetchLogs() {
       try {
@@ -107,13 +95,11 @@ export default function FoodProgress() {
         }, {});
         setFoodLogs(grouped);
       } catch (err) {
-        console.error("fetchLogs error:", err);
+        console.error(err);
       }
     }
     fetchLogs();
   }, []);
-
-  const todayStr = new Date().toISOString().split("T")[0];
 
   function fillMissingDates(logs, length) {
     const result = [];
@@ -131,33 +117,23 @@ export default function FoodProgress() {
     return result;
   }
 
-  let data = [];
-  if (range === "today") {
-    data = [
-      {
-        date: todayStr,
-        label: formatDate(todayStr),
-        meals: foodLogs[todayStr] || [],
-      },
-    ];
-  } else if (range === "yesterday") {
-    const y = new Date();
-    y.setDate(y.getDate() - 1);
-    const dateStr = y.toISOString().split("T")[0];
-    data = [
-      {
-        date: dateStr,
-        label: formatDate(dateStr),
-        meals: foodLogs[dateStr] || [],
-      },
-    ];
-  } else if (range === "week") {
-    data = fillMissingDates(foodLogs, 7);
-  } else if (range === "month") {
-    data = fillMissingDates(foodLogs, 30);
-  }
+  const rangeLengths = { today: 1, yesterday: 1, week: 7, month: 30 };
+  const length = rangeLengths[range] || 7;
 
-  // Summary
+  const data = Array.from({ length }, (_, i) => {
+    const d = new Date();
+    if (range === "yesterday") d.setDate(d.getDate() - 1);
+    else if (range === "week" || range === "month")
+      d.setDate(d.getDate() - (length - 1 - i));
+
+    const dateStr = d.toISOString().split("T")[0];
+    return {
+      date: dateStr,
+      label: formatDate(d),
+      meals: foodLogs[dateStr] || [],
+    };
+  });
+
   const totalMeals = data.reduce((sum, d) => sum + d.meals.length, 0);
   const avgMeals = (totalMeals / data.length).toFixed(1);
 
@@ -172,72 +148,59 @@ export default function FoodProgress() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Food Progress</h1>
-      <div className="progress-container">
-        {/* Left navigation */}
-        <div className="left-column">
-          <button onClick={() => navigate("/dashboard")} className="btn">
-            ⬅ Back to Dashboard
-          </button>
-          <button
-            onClick={() => navigate("/progress/water")}
-            className="btn btn-water"
-          >
-            Water
-          </button>
-          <button
-            onClick={() => navigate("/progress/sleep")}
-            className="btn btn-sleep"
-          >
-            Sleep
-          </button>
-          <button
-            onClick={() => navigate("/progress/exercise")}
-            className="btn btn-exercise"
-          >
-            Exercise
-          </button>
-          <button
-            onClick={() => navigate("/progress/food")}
-            className="btn btn-food"
-          >
-            Food
-          </button>
-        </div>
+      <Header />
+      <h1 className="text-2xl font-bold mb-4">{category} Progress</h1>
 
-        {/* Right content */}
-        <div className="right-column">
-          <div className="range-buttons">
-            {["today", "yesterday", "week", "month"].map((r) => (
-              <button
-                key={r}
-                onClick={() => setRange(r)}
-                className={range === r ? "btn-range active" : "btn-range"}
-              >
-                {r === "week"
-                  ? "1 Week"
-                  : r.charAt(0).toUpperCase() + r.slice(1)}
-              </button>
-            ))}
-          </div>
+      {/* Dropdowns */}
+      <div className="filters mb-4 flex gap-4">
+        <select
+          className="dropdown"
+          value={category}
+          onChange={(e) => {
+            const cat = e.target.value;
+            setCategory(cat);
+            if (cat === "Water") navigate("/progress/water");
+            else if (cat === "Sleep") navigate("/progress/sleep");
+            else if (cat === "Exercise") navigate("/progress/exercise");
+            else if (cat === "Food") navigate("/progress/food");
+          }}
+        >
+          {["Water", "Sleep", "Exercise", "Food"].map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
 
-          <p className="font-bold mb-4">{summary}</p>
+        <select
+          className="dropdown"
+          value={range}
+          onChange={(e) => setRange(e.target.value)}
+        >
+          {["today", "yesterday", "week", "month"].map((r) => (
+            <option key={r} value={r}>
+              {r === "week" ? "1 Week" : r.charAt(0).toUpperCase() + r.slice(1)}
+            </option>
+          ))}
+        </select>
+      </div>
 
-          <div className="food-grid">
-            {data.map((d) => (
-              <FoodRow
-                key={d.date}
-                label={d.label}
-                meals={d.meals}
-                isToday={d.date === todayStr}
-              />
-            ))}
-          </div>
+      {/* Food grid */}
+      <div className={`food-grid ${range === "month" ? "month-view" : ""}`}>
+        {data.map((d) => (
+          <FoodRow
+            key={d.date}
+            label={d.label}
+            meals={d.meals}
+            isToday={d.date === todayStr}
+          />
+        ))}
+      </div>
 
-          <div className="mt-6">
-            <TipBox category="Food" />
-          </div>
-        </div>
+      <p className="font-bold mt-4">{summary}</p>
+
+      <div className="mt-6">
+        <TipBox category="Food" />
       </div>
     </div>
   );
