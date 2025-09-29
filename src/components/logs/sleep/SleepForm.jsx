@@ -50,6 +50,7 @@ export default function SleepForm() {
     <div className="form-block">
       <p>Add Sleep</p>
       <form ref={formRef} action={AddSleep} className="sleepform">
+      <div className="form-row">
         <label>
           Date:
           <input
@@ -71,6 +72,8 @@ export default function SleepForm() {
             <option value="Nap">Nap</option>
           </select>
         </label>
+        </div>
+        <div className="form-row">
         <label>
           Start Time:
           <input type="time" name="start_time" required />
@@ -79,6 +82,7 @@ export default function SleepForm() {
           End Time:
           <input type="time" name="end_time" required />
         </label>
+        </div>
         <button disabled={loading} className="formbutton">
           {loading ? "Adding..." : "Add Sleep"}
         </button>

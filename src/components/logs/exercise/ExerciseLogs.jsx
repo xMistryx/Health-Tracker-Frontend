@@ -152,7 +152,7 @@ export default function ExerciseProgress() {
             ))}
           </div>
           <ExerciseForm />
-          <div className="mt-4">
+          <div className="exerciseinfo">
             <p>
               <strong>Total:</strong> {totalMinutes} minutes
             </p>
@@ -160,11 +160,10 @@ export default function ExerciseProgress() {
               <strong>Average:</strong> {avgMinutes} minutes
             </p>
           </div>
-
-          <div className="mt-6">
-            <TipBox category="Exercise & Movement" />
-          </div>
         </div>
+      </div>
+      <div className="mt-6">
+        <TipBox category={["Exercise & Movement", "Rest & Recovery", "Balance"]} />
       </div>
     </div>
   );

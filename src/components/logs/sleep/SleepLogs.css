@@ -10,9 +10,9 @@
 .sleep-left-column {
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
-  gap: 20px;
+  gap: 150px;
   width: 100%;
 }
 
@@ -20,6 +20,7 @@
   width: 100%;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 15px;
 }
 
@@ -58,7 +59,7 @@
 
 .sleep-segment {
   position: absolute;
-  height: 22px; 
+  height: 22px;
   border-radius: 4px;
 }
 
@@ -69,11 +70,80 @@
   color: #4f6b57;
 }
 
-.sleep-grid.mt-4 {
+.sleep-grid {
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
 .sleep-day-label {
-  width: 20px;
+  width: 30px;
+}
+
+.sleepinfo {
+  display: flex;
+  gap: 100px;
+}
+
+@media (max-width: 768px) {
+  .sleep-page-container {
+    padding: 60px 10px 10px 10px;
+  }
+
+  .sleep-left-column {
+    gap: 50px;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .sleep-timeline {
+    width: 300px;
+    min-width: 300px;
+    margin: 0 5px;
+  }
+
+  .sleep-day-label {
+    width: 25px;
+    font-size: 0.9rem;
+  }
+
+  .sleep-total-hours {
+    width: 60px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .sleep-page-container {
+    padding: 60px 5px 5px 5px;
+  }
+
+  .sleep-left-column {
+    flex-direction: row;
+    gap: 10px;
+    padding-bottom: 5px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .sleep-timeline {
+    width: 250px;
+    min-width: 250px;
+    margin: 0;
+  }
+
+  .sleep-day-label {
+    width: 20px;
+    font-size: 0.8rem;
+  }
+
+  .sleep-total-hours {
+    width: 50px;
+    font-size: 0.8rem;
+  }
+
+  .sleepinfo {
+  gap: 10px;
+  }
 }

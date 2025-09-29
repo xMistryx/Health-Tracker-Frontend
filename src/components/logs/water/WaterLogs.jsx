@@ -147,7 +147,7 @@ export default function WaterLogs() {
               />
             ))}
           </div>
-          <div className="mt-4">
+          <div className="waterinfo">
             <p>
               <strong>Total:</strong> {total} oz
             </p>
@@ -155,10 +155,10 @@ export default function WaterLogs() {
               <strong>Average:</strong> {avg} oz
             </p>
           </div>
-          <div className="mt-6">
-            <TipBox category="Water" />
-          </div>
         </div>
+      </div>
+      <div className="mt-6">
+        <TipBox category={["Water", "Electrolytes"]} />
       </div>
     </div>
   );

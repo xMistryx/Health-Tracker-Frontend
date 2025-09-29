@@ -56,19 +56,16 @@ export default function SleepProgress() {
   const navigate = useNavigate();
   const { token } = useAuth();
 
-  // Fetch sleep logs from backend
   const {
     data: rawSleepLogs,
     loading,
     error,
   } = useQuery("/sleep_logs", "sleep");
 
-  // Process and aggregate sleep logs
   const sleepLogs = rawSleepLogs || [];
 
   const todayStr = new Date().toLocaleDateString("en-CA");
 
-  // Authentication check
   if (!token) {
     return (
       <div className="sleep-page-container">
@@ -78,7 +75,6 @@ export default function SleepProgress() {
     );
   }
 
-  // Loading state
   if (loading) {
     return (
       <div className="sleep-page-container">
@@ -88,7 +84,6 @@ export default function SleepProgress() {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <div className="sleep-page-container">
@@ -98,32 +93,26 @@ export default function SleepProgress() {
     );
   }
 
-  // Fill missing days for the current month
   function fillMissingDates(logs) {
     const result = [];
 
-    // Month: entire current month (1st to last day)
     const today = new Date();
     const year = today.getFullYear();
     const month = today.getMonth();
 
-    // Get last day of current month
     const lastDay = new Date(year, month + 1, 0);
 
-    // Loop through each day of the month
     for (let day = 1; day <= lastDay.getDate(); day++) {
       const d = new Date(year, month, day);
-      const dateStr = d.toLocaleDateString("en-CA"); // ✅ local YYYY-MM-DD
+      const dateStr = d.toLocaleDateString("en-CA");
 
-      // Only include logs starting on this local date
       const segments = logs
         .filter((log) => {
           const logDate = new Date(log.date);
-          const logDateStr = logDate.toLocaleDateString("en-CA"); // ✅ local
+          const logDateStr = logDate.toLocaleDateString("en-CA");
           return logDateStr === dateStr;
         })
         .map((log) => {
-          // Extract time from full datetime strings
           const startTime = new Date(log.start_time);
           const endTime = new Date(log.end_time);
 
@@ -134,7 +123,7 @@ export default function SleepProgress() {
 
           let startHour = startH + startM / 60;
           let endHour = endH + endM / 60;
-          if (endHour <= startHour) endHour += 24; // overnight
+          if (endHour <= startHour) endHour += 24;
 
           return {
             start: startHour,
@@ -153,10 +142,8 @@ export default function SleepProgress() {
     return result;
   }
 
-  // Get current month data
   const days = fillMissingDates(sleepLogs);
 
-  // Calculate totals and averages
   const totalHours = days.reduce(
     (sum, d) => sum + d.segments.reduce((segSum, s) => segSum + s.duration, 0),
     0
@@ -192,7 +179,7 @@ export default function SleepProgress() {
             ))}
           </div>
           <SleepForm />
-          <div className="mt-4">
+          <div className="sleepinfo">
             <p>
               <strong>Total:</strong> {totalHours.toFixed(1)} hours
             </p>
@@ -201,10 +188,10 @@ export default function SleepProgress() {
             </p>
           </div>
 
-          <div className="mt-6">
-            <TipBox category="Sleep" />
-          </div>
         </div>
+      </div>
+      <div className="mt-6">
+        <TipBox category={["Sleep", "Naps", "Sunlight"]} />
       </div>
     </div>
   );

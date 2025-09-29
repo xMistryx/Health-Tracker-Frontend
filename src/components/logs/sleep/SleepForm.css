@@ -4,6 +4,7 @@
   align-items: center;
   background-color: #aac9a056;
   border-radius: 10px;
+  padding-top: 5px;
 }
 
 .sleepform {
@@ -33,4 +34,44 @@ select {
 .sleepselect,
 .formbutton {
   height: 35px;
+}
+
+@media (max-width: 768px) {
+  .sleepform {
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .form-block input {
+    width: 80px;
+    padding: 4px 8px;
+  }
+
+  .sleepselect,
+  .formbutton {
+    height: 32px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .sleepform {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 10px;
+  }
+
+  .form-block input {
+    width: 120px;
+  }
+
+  .sleepselect,
+  .formbutton {
+    width: 120px;
+  }
 }

@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useAuth } from "../auth/AuthContext";
 import useQuery from "../api/useQuery";
+import TipBox from "../tip/Tip";
 import "./CommitmentPage.css";
 
 const CATEGORY_PALETTES = {
@@ -162,6 +163,9 @@ export default function CommitmentPage() {
             </div>
           </div>
         ))}
+      </div>
+      <div className="mt-6">
+        <TipBox category={["General Wellness", "Balance", "Sunlight"]} />
       </div>
     </div>
   );
