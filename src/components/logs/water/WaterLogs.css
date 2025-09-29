@@ -126,11 +126,13 @@ p {
   opacity: 0.3;
   cursor: pointer;
   transition: transform 0.2s;
+  user-select: none;
 }
 
 .water-droplet:hover {
   transform: scale(1.3);
   opacity: 1;
+  color: #4fa49c;
 }
 
 .water-droplet.full {
@@ -148,4 +150,15 @@ p {
   text-align: right;
   font-weight: 600;
   color: #4f6b57;
+}
+.today-row {
+  background-color: #e0f7fa; /* light aqua background */
+  border-radius: 8px;
+  padding: 6px;
+}
+
+/* Optional: make the label bold */
+.today-row .water-day-label {
+  font-weight: bold;
+  color: #00796b; /* teal text */
 }
