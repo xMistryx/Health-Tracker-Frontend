@@ -7,6 +7,7 @@ import CommitmentPage from "./components/commitments/CommitmentPage.jsx";
 import WaterLogs from "./components/logs/water/WaterLogs.jsx";
 import SleepLogs from "./components/logs/sleep/SleepLogs.jsx";
 import ExerciseLogs from "./components/logs/exercise/ExerciseLogs.jsx";
+import FoodLogs from "./components/logs/food/FoodLogs.jsx";
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
           <Route path="/water" element={<WaterLogs />} />
           <Route path="/sleep" element={<SleepLogs />} />
           <Route path="/exercise" element={<ExerciseLogs />} />
+          <Route path="/food" element={<FoodLogs />} />
         </Route>
       </Routes>
     </>

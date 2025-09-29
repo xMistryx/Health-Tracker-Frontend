@@ -1,6 +1,6 @@
 import React from "react";
 import useQuery from "../api/useQuery";
-import sleepIcon from "../../assets/images/sleep-icon.jpg";
+import sleepIcon from "../../assets/images/sleep-icon.png";
 import { Link } from "react-router-dom";
 
 export default function SleepDash({ date }) {
@@ -8,13 +8,18 @@ export default function SleepDash({ date }) {
     `/sleep_logs?date=${date}`,
     `sleep-logs-${date}`
   );
-  const log =
+  const sleepLogs =
     data && data.length
-      ? data.find((item) => {
+      ? data.filter((item) => {
           const logDate = new Date(item.date).toISOString().split("T")[0];
           return logDate === date;
         })
-      : null;
+      : [];
+
+  const totalDuration = sleepLogs.reduce(
+    (sum, log) => sum + Number(log.duration || 0),
+    0
+  );
 
   return (
     <Link to="/sleep" className="loglink">
@@ -28,9 +33,9 @@ export default function SleepDash({ date }) {
           <span>Loading...</span>
         ) : error ? (
           <span style={{ color: "red" }}>{error}</span>
-        ) : log ? (
+        ) : sleepLogs.length > 0 ? (
           <span style={{ fontSize: "1.2em", marginLeft: 8 }}>
-            {log.sleep_type}: {log.duration} hours
+            Sleep: {(totalDuration / 60).toFixed(1)} hours
           </span>
         ) : (
           <span style={{ fontSize: "1.2em", marginLeft: 8 }}>

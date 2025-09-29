@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import WaterDash from "./WaterDash";
 import SleepDash from "./SleepDash";
 import ExerciseDash from "./ExerciseDash";
+import FoodDash from "./FoodDash";
 import "./Dashboard.css";
 
 export default function Dashboard({ user, onSignOut }) {
@@ -15,8 +16,6 @@ export default function Dashboard({ user, onSignOut }) {
 
   const [date, setDate] = useState(todayString);
 
-  console.log("Dashboard rendering with date:", date);
-
   return (
     <div className="dashboard-container">
       <div className="date-picker-container">
@@ -24,8 +23,7 @@ export default function Dashboard({ user, onSignOut }) {
           type="date"
           value={date}
           onChange={(e) => {
-            console.log("Date changed to:", e.target.value);
-            setDate(e.target.value);
+          setDate(e.target.value);
           }}
         />
       </div>
@@ -34,6 +32,7 @@ export default function Dashboard({ user, onSignOut }) {
         <WaterDash date={date} />
         <SleepDash date={date} />
         <ExerciseDash date={date} />
+        <FoodDash date={date} />
       </div>
     </div>
   );

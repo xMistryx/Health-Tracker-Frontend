@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./home.css";
-import sprouticon from "../../assets/images/sprouticon.jpeg";
+import sprouticon from "../../assets/images/sprout-icon.jpeg";
 import sprout from "../../assets/images/sprout.png";
 
 import SignInForm from "../auth/SignInForm";

@@ -4,12 +4,7 @@
   align-items: center;
   padding: 20px;
 }
-/* .commitment-page .controls {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-} */
+
 .year-grid {
   /* lay out month cards horizontally and wrap to new lines as needed */
   display: flex;
@@ -72,4 +67,19 @@
 
 .commit-select:hover {
   background-color: #e08b69;
+}
+
+@media (max-width: 768px) {
+  
+}
+
+@media (max-width: 480px) {
+  .commitment-page {
+    padding-top: 50px;
+  }
+
+   .commitment-page h2 {
+    text-align: center;
+    width: 270px;
+   }
 }

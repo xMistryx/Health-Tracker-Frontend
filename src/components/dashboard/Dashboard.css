@@ -38,7 +38,8 @@
 /* Individual Logs */
 .water-log,
 .sleep-log,
-.exercise-log {
+.exercise-log,
+.food-log {
   display: flex;
   align-items: center;
   gap: 15px;
@@ -52,51 +53,78 @@
 /* Icons */
 .water-log img,
 .sleep-log img,
-.exercise-log img {
+.exercise-log img,
+.food-log img {
   width: 40px;
   height: 40px;
   object-fit: contain;
+  border-radius: 8px;
 }
 
-/* Inputs and selects */
-.water-log input,
-.sleep-log input,
-.sleep-log select,
-.exercise-log input,
-.exercise-log select {
-  padding: 8px 10px;
-  font-size: 0.95rem;
-  border-radius: 5px;
-  border: 1px solid #bac9b2;
-  background: #e8e6e1;
-  color: #4f6b57;
-}
-
-/* Submit Button */
-.submit-btn {
-  padding: 10px 25px;
-  font-size: 1rem;
-  background-color: #d9a48f;
-  color: #4f6b57;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.submit-btn:hover {
-  background-color: #e08b69;
+.water-log span,
+.sleep-log span,
+.exercise-log span,
+.food-log span {
+  width: 190px;
 }
 
 .loglink {
   text-decoration: none;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 15px 10px;
+  }
+
+  .landing-container {
+    height: auto;
+    min-height: 100vh;
+    margin-top: 0;
+  }
+
+  .logs-section {
+    gap: 15px;
+  }
+
+  .water-log,
+  .sleep-log,
+  .exercise-log,
+  .food-log {
+    padding: 10px 12px;
+  }
+
+  .water-log span,
+  .sleep-log span,
+  .exercise-log span,
+  .food-log span {
+    width: auto;
+    flex: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-container {
+    padding: 10px 5px;
+  }
+
+  .date-picker-container {
+    margin-bottom: 20px;
+  }
+
+  .water-log,
+  .sleep-log,
+  .exercise-log,
+  .food-log {
+    gap: 10px;
+    padding: 8px 10px;
+  }
 
   .water-log img,
   .sleep-log img,
-  .exercise-log img {
-    margin-bottom: 10px;
+  .exercise-log img,
+  .food-log img {
+    width: 35px;
+    height: 35px;
   }
 }

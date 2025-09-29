@@ -1,6 +1,6 @@
 import React from "react";
 import useQuery from "../api/useQuery";
-import exerciseIcon from "../../assets/images/fitness-icon.jpg";
+import exerciseIcon from "../../assets/images/exercise-icon.png";
 import { Link } from "react-router-dom";
 
 export default function ExerciseDash({ date }) {
@@ -8,13 +8,18 @@ export default function ExerciseDash({ date }) {
     `/exercise_logs?date=${date}`,
     `exercise-logs-${date}`
   );
-  const log =
+  const exerciseLogs =
     data && data.length
-      ? data.find((item) => {
+      ? data.filter((item) => {
           const logDate = new Date(item.date).toISOString().split("T")[0];
           return logDate === date;
         })
-      : null;
+      : [];
+
+  const totalDuration = exerciseLogs.reduce(
+    (sum, log) => sum + Number(log.duration || 0),
+    0
+  );
 
   return (
     <Link to="/exercise" className="loglink">
@@ -22,15 +27,15 @@ export default function ExerciseDash({ date }) {
         <img
           src={exerciseIcon}
           alt="Exercise"
-          style={{ width: "40px", height: "40px", marginRight: "10px" }}
+          style={{ width: "40px", height: "40px" }}
         />
         {loading ? (
           <span>Loading...</span>
         ) : error ? (
           <span style={{ color: "red" }}>{error}</span>
-        ) : log ? (
+        ) : exerciseLogs.length > 0 ? (
           <span style={{ fontSize: "1.2em", marginLeft: 8 }}>
-            {log.exercise_type}: {log.duration} minutes
+            Activity: {(totalDuration / 60).toFixed(1)} hours
           </span>
         ) : (
           <span style={{ fontSize: "1.2em", marginLeft: 8 }}>

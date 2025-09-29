@@ -1,19 +1,36 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import useQuery from "../api/useQuery";
 import "./tip.css";
 
 export default function TipBox({ category = "water" }) {
   const [tip, setTip] = useState("");
 
-  // Fetch tips from API using the correct route format
+  const cleanText = (text) => {
+    if (!text) return text;
+    return text
+      .replace(/\u00e2\u20ac\u201d/g, " — ") 
+      .replace(/â€"/g, " — ") 
+      .replace(/â€™/g, "'") 
+      .replace(/â€œ/g, '"') 
+      .replace(/â€/g, '"') 
+      .replace(/â€"/g, "—")
+      .replace(/â€"/g, "–") 
+      .replace(/""/g, " — ") 
+      .replace(/Â/g, ""); 
+  };
+
+  const selectedCategory = useMemo(() => {
+    const categories = Array.isArray(category) ? category : [category];
+    return categories[Math.floor(Math.random() * categories.length)];
+  }, [category]);
+
   const { data, loading, error } = useQuery(
-    `/health_tips/category/${category}`,
-    `tips-${category}`
+    `/health_tips/category/${selectedCategory}`,
+    `tips-${selectedCategory}`
   );
 
   useEffect(() => {
     if (data && data.length > 0) {
-      // Pick a random tip from the API data
       const randomIndex = Math.floor(Math.random() * data.length);
       const selectedTip =
         typeof data[randomIndex] === "string"
@@ -22,7 +39,7 @@ export default function TipBox({ category = "water" }) {
             data[randomIndex]?.content ||
             data[randomIndex]?.message;
 
-      setTip(selectedTip);
+      setTip(cleanText(selectedTip));
     }
   }, [data]);
 

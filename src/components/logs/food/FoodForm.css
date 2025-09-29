@@ -7,13 +7,20 @@
   padding-top: 5px;
 }
 
-.exerciseform {
+.foodform {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
+  gap: 5px;
   padding: 5px;
+  flex-wrap: wrap;
+}
+
+.food-form-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .form-block input,
@@ -22,33 +29,39 @@ select {
   color: #4f6b57;
 }
 
-.form-block input {
-  width: 100px;
-  padding: 6px 12px;
-}
-
 .dateinput {
   height: 21px;
 }
 
-.exerciseselect,
+.form-block .foodinput {
+  width: 80px;
+}
+
 .formbutton {
   height: 35px;
 }
 
 @media (max-width: 768px) {
-  .exerciseform {
-    flex-wrap: wrap;
+  .foodform {
+    gap: 8px;
+  }
+
+  .food-form-row {
     gap: 8px;
     justify-content: center;
+    flex-wrap: wrap;
   }
 
-  .form-block input {
-    width: 80px;
-    padding: 4px 8px;
+  .food-form-row label {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.9rem;
   }
 
-  .exerciseselect,
+  .form-block .dateinput {
+    width: 100px;
+  }
+
   .formbutton {
     height: 32px;
     font-size: 0.9rem;
@@ -56,19 +69,17 @@ select {
 }
 
 @media (max-width: 480px) {
-  .exerciseform {
-    flex-direction: row;
-    align-items: flex-end;
+  .foodform {
     gap: 10px;
-    width: 270px;
   }
 
-  .form-block input {
-    width: 120px;
+  .food-form-row {
+    flex-direction: row;
+    gap: 8px;
+    width: 285px;
   }
 
-  .exerciseselect,
-  .formbutton {
+  .form-block .foodinput {
     width: 120px;
   }
 }

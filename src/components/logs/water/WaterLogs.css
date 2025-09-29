@@ -36,11 +36,6 @@
   cursor: pointer;
 }
 
-.water-chart-container {
-  margin: 0 auto;
-  max-width: 600px;
-}
-
 .water-stats {
   margin-top: 15px;
 }
@@ -48,14 +43,12 @@
 .water-left-column {
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
-  gap: 20px;
-  width: 100%;
+  gap: 60px;
 }
 
 .water-right-column {
-  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -65,11 +58,6 @@
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
-}
-
-.water-chart-container {
-  height: 300px;
-  width: 100%;
 }
 
 h1 {
@@ -84,31 +72,28 @@ p {
   margin: 0;
 }
 
-.mt-4 {
+.waterinfo {
   display: flex;
   justify-content: space-around;
 }
 
-@media (prefers-color-scheme: light) {
-  button {
-    background-color: #9ed99b;
-  }
-}
 .water-droplet-grid {
-  margin-top: 1rem;
-  max-width: 800px;
-  width: 100%;
+  margin: 1rem auto;
+  max-width: 600px;
 }
 
 .water-droplet-row {
   display: flex;
   align-items: center;
   border-bottom: 1px solid #eee;
-  max-width: 800px;
 }
 
 .water-droplet-row.today {
-  background: #aac9a056; /* Sage green tint */
+  background: #aac9a056;
+}
+
+.water-droplet-row.today .water-droplets {
+  background: #bfd4b6;
 }
 
 .water-day-label {
@@ -119,6 +104,11 @@ p {
 .water-droplets {
   display: flex;
   gap: 4px;
+  background: #dad8d3;
+  border-radius: 4px;
+  align-items: center;
+  flex: 1;
+  padding: 2px;
 }
 
 .water-droplet {
@@ -148,4 +138,63 @@ p {
   text-align: right;
   font-weight: 600;
   color: #4f6b57;
+}
+
+@media (max-width: 768px) {
+  .water-page-container {
+    padding: 60px 10px 10px 10px;
+  }
+
+  .water-left-column {
+    gap: 20px;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .water-droplet-grid {
+    max-width: 100%;
+    margin: 0.5rem auto;
+  }
+
+  .water-day-label {
+    width: 30px;
+    font-size: 0.9rem;
+  }
+
+  .water-droplet {
+    font-size: 16px;
+  }
+
+  .water-day-total {
+    width: 50px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .water-page-container {
+    padding: 60px 5px 5px 5px;
+  }
+
+  .water-left-column {
+    flex-direction: row;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .water-droplet {
+    font-size: 14px;
+  }
+
+  .water-day-label {
+    width: 25px;
+    font-size: 0.8rem;
+  }
+
+  .water-day-total {
+    width: 40px;
+    font-size: 0.8rem;
+  }
 }
