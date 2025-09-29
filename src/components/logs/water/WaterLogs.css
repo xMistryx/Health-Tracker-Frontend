@@ -116,11 +116,13 @@ p {
   opacity: 0.3;
   cursor: pointer;
   transition: transform 0.2s;
+  user-select: none;
 }
 
 .water-droplet:hover {
   transform: scale(1.3);
   opacity: 1;
+  color: #4fa49c;
 }
 
 .water-droplet.full {
