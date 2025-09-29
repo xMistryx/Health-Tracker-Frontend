@@ -1,0 +1,28 @@
+    body {
+      font-family: 'Helvetica Neue', sans-serif;
+      background-color: #FFF8F0;
+      color: #333;
+      text-align: center;
+      padding: 60px;
+    }
+    h1 {
+      font-size: 3.5em;
+      color: #E67E22;
+    }
+    p {
+      font-size: 1.4em;
+      margin: 20px 0;
+    }
+    .emoji {
+      font-size: 4em;
+    }
+    a {
+      color: #27AE60;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    img {
+      margin-top: 20px;
+      width: 300px;
+      height: auto;
+    }
