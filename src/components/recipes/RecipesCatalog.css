@@ -1,0 +1,74 @@
+.img-div {
+    max-width: 300px;
+    max-height: 250px;
+    border-radius: 10px;
+}
+#recipe-list{
+  list-style: none; 
+   max-width: 760px;
+  margin: 28px auto;
+  background: #fffefb;
+  border-radius: 12px;
+  padding: 28px 22px;
+  box-shadow: 0 8px 30px rgba(79, 107, 87, 0.06);
+  color: #334a3a;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.recipe-title {
+    font-size: 2em;
+    margin: 0;
+    color:#4f6b57;
+;
+
+}
+.catalog-header {
+    display: flex;;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 20px;
+    margin-block: 40px;
+   }    
+.create-recipe-link {
+    padding: 8px 10px;
+    margin-top: 10px;
+   background-color: #bac9b2;
+    color:#4f6b57 ;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+   }
+   .log-regis-button{
+    margin-left: 3%;
+    margin-top: 3%;
+  
+   }
+   .search-bar {
+
+    padding: 8px 12px;
+    font-size: 16px;
+    margin: 20px 0;
+    .log-regis-button{
+          color: white;
+    }
+   }
+   .search-input {
+    width: 90%;
+    padding: 8px 5px;
+    font-size: 16px;
+    border: 0.1px solid #ccc;
+    border-radius: 9px;
+   }
+   @media (max-width: 480px) {
+    .catalog-header {
+        size: 50%;
+        flex-direction: column;
+        gap: 10px;
+    }
+   }
