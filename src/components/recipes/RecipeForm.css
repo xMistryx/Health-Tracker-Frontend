@@ -1,0 +1,160 @@
+.recipe-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
+  background-color: #bac9b2;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.recipe-form h2 {
+  text-align: center;
+}
+
+.recipe-form label {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  font-size: 14px;
+  color: #4f6b57;
+}
+
+.recipe-form input,
+.recipe-form select,
+.recipe-form textarea {
+  padding: 8px 12px;
+  font-size: 14px;
+  background-color: #e8e6e1;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-top: 5px;
+}
+
+.recipe-form input:focus,
+.recipe-form select:focus {
+  outline: none;
+}
+
+.recipe-ingredient-input {
+  width: 140px;
+}
+
+.recipe-submit-btn,
+.recipe-cancel-btn {
+  padding: 12px 15px;
+  background-color: #d9a48f;
+  color: #4f6b57;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.recipe-submit-btn:hover,
+.recipe-cancel-btn:hover {
+  background-color: #e08b69;
+}
+
+.recipe-add-ingredient {
+  width: 30px;
+  height: 30px;
+  padding: 0px;
+  font-size: 12px;
+  border-radius: 6px;
+}
+
+.recipe-remove-ingredient {
+  width: 45px;
+  height: 25px;
+  padding: 0px;
+  font-size: 10px;
+  border-radius: 6px;
+}
+
+.recipe-ingredient-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  padding: 0;
+  margin-top: 2px;
+}
+@media (max-width: 768px) {
+  .recipe-form {
+    width: 240px;
+    margin-top: 50px;
+    gap: 5px;
+  }
+
+  .recipe-form h2 {
+    margin: 10px;
+  }
+
+  .recipe-ingredient-input {
+    width: 130px;
+  }
+
+  button.recipe-submit-btn,
+  button.recipe-cancel-btn {
+    padding: 10px 10px;
+    font-size: 14px;
+    width: 105px;
+  }
+
+  .recipe-add-ingredient {
+    width: 30px;
+    height: 30px;
+    padding: 0px;
+    font-size: 12px;
+    border-radius: 6px;
+  }
+
+  .recipe-remove-ingredient {
+    width: 45px;
+    height: 25px;
+    padding: 0px;
+    font-size: 10px;
+    border-radius: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .recipe-form {
+    width: 240px;
+    margin-top: 50px;
+    gap: 5px;
+  }
+
+  .recipe-form h2 {
+    margin: 10px;
+  }
+
+  .recipe-ingredient-input {
+    width: 130px;
+  }
+
+  button.recipe-submit-btn,
+  button.recipe-cancel-btn {
+    padding: 10px 10px;
+    font-size: 14px;
+    width: 105px;
+  }
+
+  .recipe-add-ingredient {
+    width: 30px;
+    height: 30px;
+    padding: 0px;
+    font-size: 12px;
+    border-radius: 6px;
+  }
+
+  .recipe-remove-ingredient {
+    width: 45px;
+    height: 25px;
+    padding: 0px;
+    font-size: 10px;
+    border-radius: 6px;
+  }
+}

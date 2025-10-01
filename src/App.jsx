@@ -8,6 +8,10 @@ import WaterLogs from "./components/logs/water/WaterLogs.jsx";
 import SleepLogs from "./components/logs/sleep/SleepLogs.jsx";
 import ExerciseLogs from "./components/logs/exercise/ExerciseLogs.jsx";
 import FoodLogs from "./components/logs/food/FoodLogs.jsx";
+import RecipesCatalog from "./components/recipes/RecipesCatalog.jsx";
+import RecipeForm from "./components/recipes/RecipeForm.jsx";
+import RecipeDetails from "./components/recipes/RecipeDetails.jsx";
+import Error404 from "./components/error/Error404.jsx";
 
 export default function App() {
   return (
@@ -22,6 +26,11 @@ export default function App() {
           <Route path="/sleep" element={<SleepLogs />} />
           <Route path="/exercise" element={<ExerciseLogs />} />
           <Route path="/food" element={<FoodLogs />} />
+          <Route path="/recipes" element={<RecipesCatalog />} />
+          <Route path="/recipes/new" element={<RecipeForm />} />
+          <Route path="/recipes/:id/edit" element={<RecipeForm />} />
+          <Route path="/recipes/:id" element={<RecipeDetails />} />
+          <Route path="/*" element={<Error404 />} />
         </Route>
       </Routes>
     </>

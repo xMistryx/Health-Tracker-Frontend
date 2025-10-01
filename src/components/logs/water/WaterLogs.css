@@ -79,6 +79,7 @@ p {
 
 .water-droplet-grid {
   margin: 1rem auto;
+  margin-bottom: 0;
   max-width: 600px;
 }
 
@@ -88,11 +89,11 @@ p {
   border-bottom: 1px solid #eee;
 }
 
-.water-droplet-row.today {
+.water-droplet-row.today-row {
   background: #aac9a056;
 }
 
-.water-droplet-row.today .water-droplets {
+.water-droplet-row.today-row .water-droplets {
   background: #bfd4b6;
 }
 

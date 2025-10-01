@@ -60,7 +60,7 @@ export default function SleepProgress() {
     data: rawSleepLogs,
     loading,
     error,
-  } = useQuery("/sleep_logs", "sleep");
+  } = useQuery("/sleep_logs", "sleep_logs");
 
   const sleepLogs = rawSleepLogs || [];
 

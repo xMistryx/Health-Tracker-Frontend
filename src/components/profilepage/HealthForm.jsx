@@ -5,9 +5,9 @@ function HealthForm({ existingData, onSubmit }) {
   const [height, setHeight] = useState(existingData?.height || "");
   const [weight, setWeight] = useState(existingData?.weight || "");
   const [age, setAge] = useState(existingData?.age || "");
-  const initialBioSex =
-    existingData?.biological_sex || existingData?.biologicalSex || "";
-  const [biologicalSex, setBiologicalSex] = useState(initialBioSex);
+  const [biologicalSex, setBiologicalSex] = useState(
+    existingData?.biological_sex || existingData?.biologicalSex || ""
+  );
   const [gender, setGender] = useState(existingData?.gender || "");
 
   useEffect(() => {
@@ -19,9 +19,12 @@ function HealthForm({ existingData, onSubmit }) {
     );
     setGender(existingData?.gender || "");
   }, [existingData]);
-  const { mutate, loading, error } = useMutation("POST", "/health_info", [
-    "healthInfo",
-  ]);
+
+  const { mutate, loading, error } = useMutation(
+    existingData ? "PUT" : "POST",
+    existingData ? `/health_info/${existingData.id}` : "/health_info",
+    ["healthInfo"]
+  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import useQuery from "../../api/useQuery";
+import { Link } from "react-router-dom";
 import FoodForm from "./FoodForm";
 import TipBox from "../../tip/Tip";
 import "./FoodLogs.css";
@@ -33,7 +34,7 @@ function FoodRow({ day, meals, isToday }) {
           <div
             key={i}
             className={`food-meal-block ${getIntensityClass(i)}`}
-            title={`${meal.food_item}: ${meal.calories} cal, ${meal.protein}g protein, ${meal.carbs}g carbs, ${meal.fat}g fat, ${meal.fiber}g fiber`}
+            title={`${meal.calories} cal, ${meal.protein}g protein, ${meal.carbs}g carbs, ${meal.fat}g fat, ${meal.fiber}g fiber`}
           >
             {meal.food_item}
           </div>
@@ -48,7 +49,7 @@ export default function FoodLogs() {
   const navigate = useNavigate();
   const { token } = useAuth();
 
-  const { data: rawFoodLogs, loading, error } = useQuery("/food_logs", "food");
+  const { data: rawFoodLogs, loading, error } = useQuery("/food_logs", "food_logs");
 
   const foodLogs = rawFoodLogs || [];
 
@@ -149,6 +150,7 @@ export default function FoodLogs() {
               />
             ))}
           </div>
+          <Link to="/recipes" className="food-recipes-link">Not sure what to eat?</Link> 
           <FoodForm />
           <div className="foodinfo">
             <p>

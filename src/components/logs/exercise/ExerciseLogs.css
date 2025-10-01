@@ -148,7 +148,7 @@
 
   .exercise-left-column {
     flex-direction: row;
-    gap: 10px;
+    gap: 20px;
     justify-content: center;
     align-items: center;
   }
@@ -169,6 +169,6 @@
   }
 
   .exerciseinfo {
-  gap: 5px;
+  gap: 20px;
   }
 }

@@ -3,6 +3,7 @@ import WaterDash from "./WaterDash";
 import SleepDash from "./SleepDash";
 import ExerciseDash from "./ExerciseDash";
 import FoodDash from "./FoodDash";
+import AffirmationBox from "./affirmation";
 import "./Dashboard.css";
 
 export default function Dashboard({ user, onSignOut }) {
@@ -33,6 +34,7 @@ export default function Dashboard({ user, onSignOut }) {
         <SleepDash date={date} />
         <ExerciseDash date={date} />
         <FoodDash date={date} />
+        <AffirmationBox />
       </div>
     </div>
   );

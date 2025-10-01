@@ -74,7 +74,6 @@ export default function FoodForm() {
               type="number"
               name="protein"
               min="0"
-              step="0.1"
               placeholder="- - -"
               className="foodinput"
             />
@@ -87,7 +86,6 @@ export default function FoodForm() {
               type="number"
               name="carbs"
               min="0"
-              step="0.1"
               placeholder="- - -"
               className="foodinput"
             />
@@ -98,7 +96,6 @@ export default function FoodForm() {
               type="number"
               name="fat"
               min="0"
-              step="0.1"
               placeholder="- - -"
               className="foodinput"
             />
@@ -109,7 +106,6 @@ export default function FoodForm() {
               type="number"
               name="fiber"
               min="0"
-              step="0.1"
               placeholder="- - -"
               className="foodinput"
             />

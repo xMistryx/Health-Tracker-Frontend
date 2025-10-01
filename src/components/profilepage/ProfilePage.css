@@ -32,9 +32,15 @@ body {
   color: #4f6b57;
 }
 
+.profile-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
 .profile-container button {
   display: block;
-  margin: 20px auto 0 auto;
   padding: 10px 20px;
   font-size: 16px;
   background-color: #d9a48f;

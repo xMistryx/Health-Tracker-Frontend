@@ -48,7 +48,7 @@ export default function ExerciseProgress() {
     data: rawExerciseLogs,
     loading,
     error,
-  } = useQuery("/exercise_logs", "exercise");
+  } = useQuery("/exercise_logs", "exercise_logs");
 
   const exerciseLogs = rawExerciseLogs || [];
 

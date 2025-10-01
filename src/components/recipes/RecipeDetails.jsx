@@ -10,6 +10,20 @@ function formatTimestamp(ts) {
   return d.toLocaleString();
 }
 
+function cleanText(text) {
+  if (!text) return text;
+  return text
+    .replace(/â€™/g, "'") 
+    .replace(/â€œ/g, '"') 
+    .replace(/â€/g, '"') 
+    .replace(/â€"/g, " — ") 
+    .replace(/â€"/g, "–") 
+    .replace(/\u00e2\u20ac\u201d/g, " — ") 
+    .replace(/Â/g, "") 
+    .replace(/\\n/g, "\n") 
+    .replace(/\n{3,}/g, "\n\n"); 
+}
+
 export default function RecipeDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -48,11 +62,11 @@ export default function RecipeDetails() {
   function decodeJwtPayload(token) {
     if (!token) return null;
     try {
-      const parts = token.split('.');
+      const parts = token.split(".");
       if (parts.length < 2) return null;
       const payload = parts[1];
-      const b64 = payload.replace(/-/g, '+').replace(/_/g, '/');
-      const padded = b64.padEnd(b64.length + (4 - (b64.length % 4)) % 4, '=');
+      const b64 = payload.replace(/-/g, "+").replace(/_/g, "/");
+      const padded = b64.padEnd(b64.length + ((4 - (b64.length % 4)) % 4), "=");
       const decoded = atob(padded);
       return JSON.parse(decoded);
     } catch {
@@ -81,7 +95,7 @@ export default function RecipeDetails() {
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || 'Failed to delete recipe');
+        throw new Error(err.error || "Failed to delete recipe");
       }
       // on success, go back to catalog
       navigate("/recipes");
@@ -99,50 +113,77 @@ export default function RecipeDetails() {
   let ingredientsList = [];
   try {
     if (Array.isArray(recipe.ingredients)) ingredientsList = recipe.ingredients;
-    else if (typeof recipe.ingredients === "string") ingredientsList = JSON.parse(recipe.ingredients);
+    else if (typeof recipe.ingredients === "string")
+      ingredientsList = JSON.parse(recipe.ingredients);
   } catch {
     ingredientsList = [];
   }
 
   return (
-    <div className="recipe-details" style={{ padding: 18 }}>
-      {successMsg && <div style={{ background: '#e6ffed', border: '1px solid #b7f5c9', padding: 8, marginBottom: 12 }}>{successMsg}</div>}
-      <h2>{recipe.title}</h2>
-      {recipe.image_url && (
-        <img src={recipe.image_url} alt={recipe.title} style={{ maxWidth: 400, width: "100%", height: "auto" }} />
-      )}
-      <p>{recipe.description}</p>
+    <div className="recipe-page-background">
+      <div className="recipe-details">
+        {successMsg && (
+          <div
+            style={{
+              background: "#a8d4ceff",
+              border: "1px solid rgba(150, 209, 189, 1)",
+              padding: 8,
+              marginBottom: 12,
+            }}
+          >
+            {successMsg}
+          </div>
+        )}
+        <h2>{recipe.title}</h2>
+        {recipe.image_url && (
+          <img
+            src={recipe.image_url}
+            alt={recipe.title}
+            style={{ maxWidth: 400, width: "100%", height: "auto" }}
+          />
+        )}
+        <p>{cleanText(recipe.description)}</p>
 
-      <h3>Ingredients</h3>
-      {ingredientsList.length ? (
-        <ul>
-          {ingredientsList.map((ing, i) => (
-            <li key={i}>{typeof ing === "string" ? ing : JSON.stringify(ing)}</li>
-          ))}
-        </ul>
-      ) : (
-        <p>No ingredients listed.</p>
-      )}
+        <h3>Ingredients</h3>
+        {ingredientsList.length ? (
+          <ul>
+            {ingredientsList.map((ing, i) => (
+              <li key={i}>
+                {typeof ing === "string" ? cleanText(ing) : JSON.stringify(ing)}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No ingredients listed.</p>
+        )}
 
-      <h3>Instructions</h3>
-      <div style={{ whiteSpace: "pre-wrap" }}>{recipe.instructions}</div>
-
-      <p>
-        <strong>Added by:</strong> {recipe.created_by}
-      </p>
-      <p className="times">
-        <strong>Created at:</strong> {formatTimestamp(recipe.created_at)}
-      </p>
-      <p className="times">
-        <strong>Last updated:</strong> {formatTimestamp(recipe.updated_at)}
-      </p>
-
-      {isCreator && (
-        <div className="actions">
-          <button onClick={handleEdit}>Edit recipe</button>
-          <button onClick={handleDelete} style={{ background: '#e55353', color: 'white' }}>Delete</button>
+        <h3>Instructions</h3>
+        <div style={{ whiteSpace: "pre-wrap" }} className="instructions">
+          {cleanText(recipe.instructions)}
         </div>
-      )}
+
+        <p className="madeby">
+          <strong>Added by:</strong> {recipe.created_by}
+        </p>
+        <div className="made">
+          <p className="times">
+            <strong>Created at:</strong> {formatTimestamp(recipe.created_at)}
+          </p>
+          <p className="times">
+            <strong>Last updated:</strong> {formatTimestamp(recipe.updated_at)}
+          </p>
+        </div>
+        {isCreator && (
+          <div className="actions">
+            <button onClick={handleEdit}>Edit recipe</button>
+            <button
+              onClick={handleDelete}
+            >
+              Delete
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

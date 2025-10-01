@@ -116,6 +116,15 @@
   align-items: center;
 }
 
+.food-recipes-link {
+  display: inline-block;
+  font-size: .95rem;
+  font-style: italic;
+  color: #6fa49c;
+  text-decoration: none;
+  cursor: pointer;
+}
+
 .foodinfo {
   display: flex;
   gap: 130px;
@@ -196,7 +205,7 @@
 
   .food-left-column {
     flex-direction: row;
-    gap: 5px;
+    gap: 20px;
     width: 100%;
   }
 
@@ -206,7 +215,7 @@
     align-items: center;
     gap: 4px;
     flex-wrap: nowrap;
-    width: 100%;
+    width: 350px;
     max-width: 100%;
     box-sizing: border-box;
   }
@@ -241,6 +250,6 @@
   }
 
   .foodinfo {
-  gap: 0px;
+  gap: 20px;
   }
 }

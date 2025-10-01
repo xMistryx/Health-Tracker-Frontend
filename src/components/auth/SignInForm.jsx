@@ -22,7 +22,7 @@ export default function SignInForm({ onBack, onSignIn }) {
             // If onSignIn does not handle navigation, fallback:
             // navigate("/dashboard");
         } catch (error) {
-            setError(error.message);
+            setError("Login failed. Please check your credentials.");
             setSuccess("");
         }
     };

@@ -1,0 +1,35 @@
+    .errcontainer {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      min-width: 100vw;
+      background-color: #ece9e3;
+    }
+    .errtop {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin-top: 50px;
+    }
+    .errh1 {
+      font-size: 3.5em;
+      color: #dda088;
+    }
+    .errimg {
+      margin-top: 20px;
+      width: 300px;
+      height: auto;
+    }
+    .errp {
+      font-size: 1.4em;
+      margin: 10px 0;
+    }
+    .erra{
+      color: #6fa49c;
+      text-decoration: none;
+      font-weight: bold;
+      font-style: italic;
+    }

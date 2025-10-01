@@ -3,7 +3,6 @@ header {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  gap: 30px;
   background-color: #bac9b2;
   width: 100%;
   position: fixed;
@@ -14,8 +13,15 @@ header {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
+.tend {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-inline: 5px;
+}
+
 .link,
-p {
+.tend-text {
   color: #4f6b57;
   font-weight: bolder;
   text-decoration: none;
