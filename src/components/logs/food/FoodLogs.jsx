@@ -48,7 +48,11 @@ export default function FoodLogs() {
   const navigate = useNavigate();
   const { token } = useAuth();
 
-  const { data: rawFoodLogs, loading, error } = useQuery("/food_logs", "food");
+  const {
+    data: rawFoodLogs,
+    loading,
+    error,
+  } = useQuery("/food_logs", "food_logs");
 
   const foodLogs = rawFoodLogs || [];
 

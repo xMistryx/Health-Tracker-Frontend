@@ -60,7 +60,7 @@ export default function SleepProgress() {
     data: rawSleepLogs,
     loading,
     error,
-  } = useQuery("/sleep_logs", "sleep");
+  } = useQuery("/sleep_logs", "sleep_logs");
 
   const sleepLogs = rawSleepLogs || [];
 
@@ -187,7 +187,6 @@ export default function SleepProgress() {
               <strong>Average:</strong> {avgHours} hours
             </p>
           </div>
-
         </div>
       </div>
       <div className="mt-6">

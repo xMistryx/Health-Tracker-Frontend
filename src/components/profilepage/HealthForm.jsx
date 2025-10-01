@@ -5,11 +5,12 @@ function HealthForm({ existingData, onSubmit }) {
   const [height, setHeight] = useState(existingData?.height || "");
   const [weight, setWeight] = useState(existingData?.weight || "");
   const [age, setAge] = useState(existingData?.age || "");
-  const initialBioSex =
-    existingData?.biological_sex || existingData?.biologicalSex || "";
-  const [biologicalSex, setBiologicalSex] = useState(initialBioSex);
+  const [biologicalSex, setBiologicalSex] = useState(
+    existingData?.biological_sex || existingData?.biologicalSex || ""
+  );
   const [gender, setGender] = useState(existingData?.gender || "");
 
+  // Update local state whenever existingData changes
   useEffect(() => {
     setHeight(existingData?.height || "");
     setWeight(existingData?.weight || "");
@@ -19,9 +20,13 @@ function HealthForm({ existingData, onSubmit }) {
     );
     setGender(existingData?.gender || "");
   }, [existingData]);
-  const { mutate, loading, error } = useMutation("POST", "/health_info", [
-    "healthInfo",
-  ]);
+
+  // Use PUT for updates
+  const { mutate, loading, error } = useMutation(
+    existingData ? "PUT" : "POST",
+    existingData ? `/health_info/${existingData.id}` : "/health_info",
+    ["healthInfo"]
+  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,18 +34,33 @@ function HealthForm({ existingData, onSubmit }) {
       alert("Please fill in all fields");
       return;
     }
-    await mutate({ height, weight, age, biologicalSex, gender });
-    if (onSubmit) onSubmit();
+    if (!existingData?.id) {
+      alert("Cannot update: missing record ID");
+      return;
+    }
+
+    await mutate({
+      height,
+      weight,
+      age,
+      biologicalSex,
+      gender,
+    });
+
+    if (onSubmit) {
+      onSubmit({ height, weight, age, biologicalSex, gender });
+    }
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      style={{ maxWidth: "400px", margin: "0 auto" }}
       className="ppform"
+      style={{ maxWidth: "400px", margin: "0 auto" }}
     >
       <h2>{existingData ? "Edit Health Info" : "Add Health Info"}</h2>
       {error && <p style={{ color: "red" }}>{error}</p>}
+
       <label>
         Height:
         <input
@@ -88,6 +108,7 @@ function HealthForm({ existingData, onSubmit }) {
           <option value="Agender">Agender</option>
         </select>
       </label>
+
       <button type="submit" disabled={loading}>
         {loading ? "Saving..." : existingData ? "Update" : "Save"}
       </button>

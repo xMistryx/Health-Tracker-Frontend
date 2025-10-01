@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import "./Navbar.css"
+import "./Navbar.css";
 
 export default function Navbar() {
   return (
@@ -7,9 +7,18 @@ export default function Navbar() {
       <header>
         <p>Tend</p>
         <nav>
-          <NavLink to="/Dashboard" className="link">Home</NavLink>
-          <NavLink to="/Commitment" className="link">Commitment</NavLink>
-          <NavLink to="/Profile" className="link">Personal</NavLink>
+          <NavLink to="/Dashboard" className="link">
+            Home
+          </NavLink>
+          <NavLink to="/Commitment" className="link">
+            Commitment
+          </NavLink>
+          <NavLink to="/Profile" className="link">
+            Personal
+          </NavLink>
+          <NavLink to="/Recipes" className="link">
+            Recipes
+          </NavLink>
         </nav>
       </header>
     </>

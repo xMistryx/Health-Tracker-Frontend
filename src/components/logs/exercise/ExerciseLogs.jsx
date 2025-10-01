@@ -48,7 +48,7 @@ export default function ExerciseProgress() {
     data: rawExerciseLogs,
     loading,
     error,
-  } = useQuery("/exercise_logs", "exercise");
+  } = useQuery("/exercise_logs", "exercise_logs");
 
   const exerciseLogs = rawExerciseLogs || [];
 
@@ -163,7 +163,9 @@ export default function ExerciseProgress() {
         </div>
       </div>
       <div className="mt-6">
-        <TipBox category={["Exercise & Movement", "Rest & Recovery", "Balance"]} />
+        <TipBox
+          category={["Exercise & Movement", "Rest & Recovery", "Balance"]}
+        />
       </div>
     </div>
   );
