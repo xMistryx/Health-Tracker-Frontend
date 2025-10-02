@@ -1,9 +1,8 @@
-// src/components/EncouragementToast.jsx
 import React from "react";
 import "./Encouragement.css";
 
 export default function Encouragement({ message, onClose }) {
-  if (!message) return null;
+  if (!message) return null; // don’t render if empty
 
   return (
     <div className="encouragement-container">

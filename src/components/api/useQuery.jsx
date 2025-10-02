@@ -10,26 +10,22 @@ export default function useQuery(resource, tag) {
   const query = useCallback(async () => {
     setLoading(true);
     setError(null);
-    setData(undefined); 
     try {
       const result = await request(resource);
       setData(result);
-    } catch (error) {
-      console.error(error);
-      setError(error.message);
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Error fetching data");
     } finally {
       setLoading(false);
     }
   }, [request, resource]);
 
   useEffect(() => {
-    setData(undefined);
-    setError(null);
-  }, [resource]);
-
-  useEffect(() => {
+    // Call query only after mount / resource change
     if (tag) provideTag(tag, query);
     query();
-  }, [resource, tag, query, provideTag]); 
+  }, [query, tag, provideTag]);
+
   return { data, loading, error };
 }

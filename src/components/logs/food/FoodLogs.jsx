@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import useQuery from "../../api/useQuery";
 import { Link } from "react-router-dom";
 import FoodForm from "./FoodForm";
 import TipBox from "../../tip/Tip";
+import Encouragement from "../../encouragement/Encouragement";
 import "./FoodLogs.css";
 
 const getIntensityClass = (mealIndex) => {
@@ -17,15 +18,6 @@ const getIntensityClass = (mealIndex) => {
 };
 
 function FoodRow({ day, meals, isToday }) {
-  const totalCalories = meals.reduce(
-    (sum, m) => sum + Number(m.calories || 0),
-    0
-  );
-  const totalProtein = meals.reduce(
-    (sum, m) => sum + Number(m.protein || 0),
-    0
-  );
-
   return (
     <div className={`food-food-row ${isToday ? "today" : ""}`}>
       <span className="food-day-label">{day.getDate()}</span>
@@ -48,85 +40,88 @@ function FoodRow({ day, meals, isToday }) {
 export default function FoodLogs() {
   const navigate = useNavigate();
   const { token } = useAuth();
+  const {
+    data: rawFoodLogs,
+    loading,
+    error,
+  } = useQuery("/food_logs", "food_logs");
 
-  const { data: rawFoodLogs, loading, error } = useQuery("/food_logs", "food_logs");
-
-  const foodLogs = rawFoodLogs || [];
+  // Local logs state
+  const [logs, setLogs] = useState(rawFoodLogs || []);
+  const [toastMessage, setToastMessage] = useState("");
+  const lastMilestoneRef = useRef("");
 
   const today = new Date();
   const todayStr = new Date(today.getTime() - today.getTimezoneOffset() * 60000)
     .toISOString()
     .split("T")[0];
 
-  if (!token) {
-    return (
-      <div className="food-page-container">
-        <h1 className="text-2xl font-bold mb-6">Food Log</h1>
-        <p>Please sign in to view your food logs.</p>
-      </div>
-    );
-  }
+  // Sync query data into local state
+  useEffect(() => {
+    setLogs(rawFoodLogs || []);
+  }, [rawFoodLogs]);
 
-  if (loading) {
-    return (
-      <div className="food-page-container">
-        <h1 className="text-2xl font-bold mb-6">Food Log</h1>
-        <p>Loading food logs...</p>
-      </div>
-    );
-  }
+  if (!token) return <p>Please sign in to view your food logs.</p>;
+  if (loading) return <p>Loading food logs...</p>;
+  if (error)
+    return <p className="text-red-500">Error loading food logs: {error}</p>;
 
-  if (error) {
-    return (
-      <div className="food-page-container">
-        <h1 className="text-2xl font-bold mb-6">Food Logs</h1>
-        <p className="text-red-500">Error loading food logs: {error}</p>
-      </div>
-    );
-  }
-
-  function fillMissingDates(logs) {
+  // Fill missing dates
+  const fillMissingDates = (logsArray) => {
     const result = [];
-
-    const today = new Date();
     const year = today.getFullYear();
     const month = today.getMonth();
-
     const lastDay = new Date(year, month + 1, 0);
 
     for (let day = 1; day <= lastDay.getDate(); day++) {
       const d = new Date(year, month, day);
       const dateStr = d.toISOString().split("T")[0];
-
-      const meals = logs
-        .filter(
-          (log) => new Date(log.date).toISOString().split("T")[0] === dateStr
-        )
-        .sort((a, b) => a.id - b.id);
-
+      const meals = logsArray.filter(
+        (log) => log.date.split("T")[0] === dateStr
+      );
       result.push({ day: d, meals });
     }
-
     return result;
-  }
+  };
 
-  const days = fillMissingDates(foodLogs);
+  const days = fillMissingDates(logs);
 
   const totalMeals = days.reduce((sum, d) => sum + d.meals.length, 0);
-  const totalCalories = days.reduce(
-    (sum, d) =>
-      sum +
-      d.meals.reduce((mealSum, m) => mealSum + Number(m.calories || 0), 0),
-    0
-  );
   const avgMeals = (totalMeals / days.length).toFixed(1);
-  const avgCalories = (totalCalories / days.length).toFixed(0);
-
-  const currentMonthName = new Date().toLocaleDateString("en-US", {
+  const summary = new Date().toLocaleDateString("en-US", {
     month: "long",
     year: "numeric",
   });
-  const summary = `${currentMonthName}`;
+
+  // Hardcoded encouragements
+  const encouragementMessages = {
+    "3Meals": "Balanced and fueled! You took great care of yourself today.",
+    "5Logs": "That’s a week of food awareness!",
+    "10Logs": "Nice! You’re really building healthy habits.",
+    "20Logs": "20 logs—your future self is proud!",
+  };
+
+  // Handle new food added
+  const handleFoodAdded = (newLog) => {
+    console.log("Food added:", newLog); // this should show in console
+    setToastMessage("Great job! Keep tracking your meals 💪");
+    const updatedLogs = [...logs, newLog];
+    setLogs(updatedLogs);
+
+    const mealsToday = updatedLogs.filter(
+      (log) => log.date.split("T")[0] === newLog.date.split("T")[0]
+    );
+    let milestoneKey = null;
+    if (mealsToday.length >= 20) milestoneKey = "20Logs";
+    else if (mealsToday.length >= 10) milestoneKey = "10Logs";
+    else if (mealsToday.length >= 5) milestoneKey = "5Logs";
+    else if (mealsToday.length >= 3) milestoneKey = "3Meals";
+
+    if (milestoneKey && lastMilestoneRef.current !== milestoneKey) {
+      setToastMessage(encouragementMessages[milestoneKey]);
+      lastMilestoneRef.current = milestoneKey;
+    }
+  };
 
   return (
     <div className="food-page-container">
@@ -138,7 +133,6 @@ export default function FoodLogs() {
           </button>
           <p className="font-bold mb-4">{summary}</p>
         </div>
-
         <div className="food-right-column">
           <div className="food-grid">
             {days.map((d, idx) => (
@@ -150,8 +144,18 @@ export default function FoodLogs() {
               />
             ))}
           </div>
-          <Link to="/recipes" className="food-recipes-link">Not sure what to eat?</Link> 
-          <FoodForm />
+
+          <Link to="/recipes" className="food-recipes-link">
+            Not sure what to eat?
+          </Link>
+
+          <FoodForm onAdded={handleFoodAdded} />
+
+          <Encouragement
+            message={toastMessage}
+            onClose={() => setToastMessage("")}
+          />
+
           <div className="foodinfo">
             <p>
               <strong>Total:</strong> {totalMeals} meals
@@ -162,6 +166,7 @@ export default function FoodLogs() {
           </div>
         </div>
       </div>
+
       <div className="mt-6">
         <TipBox category={["Food & Nourishment", "Electrolytes"]} />
       </div>

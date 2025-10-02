@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import useQuery from "../../api/useQuery";
 import SleepForm from "./SleepForm";
 import TipBox from "../../tip/Tip";
+import Encouragement from "../../encouragement/Encouragement";
 import "./SleepLogs.css";
 
 function formatHour(hourDecimal) {
@@ -19,154 +20,142 @@ function SleepRow({ day, segments, isToday }) {
     .reduce((sum, s) => sum + s.duration, 0)
     .toFixed(1);
 
-  const renderSegments = (segs) =>
-    segs.map((seg, idx) => {
-      const startPct = (Math.max(seg.start, 0) / 24) * 100;
-      const widthPct =
-        ((Math.min(seg.end, 24) - Math.max(seg.start, 0)) / 24) * 100;
-      const color = seg.type === "Sleep" ? "#6FA49C" : "#9BC0B0";
-      return (
-        <div
-          key={idx}
-          className="sleep-segment"
-          style={{
-            left: `${startPct}%`,
-            width: `${widthPct}%`,
-            backgroundColor: color,
-          }}
-          title={`${seg.type}: ${formatHour(seg.start)} - ${formatHour(
-            seg.end
-          )}`}
-        />
-      );
-    });
-
   return (
     <div className={`sleep-sleep-row ${isToday ? "today" : ""}`}>
       <span className="sleep-day-label">{day.getDate()}</span>
       <div className="sleep-timeline" style={{ height: "22px" }}>
-        {renderSegments(segments)}
+        {segments.map((seg, idx) => {
+          const startPct = (Math.max(seg.start, 0) / 24) * 100;
+          const widthPct =
+            ((Math.min(seg.end, 24) - Math.max(seg.start, 0)) / 24) * 100;
+          const color = seg.type === "Sleep" ? "#6FA49C" : "#9BC0B0";
+          return (
+            <div
+              key={idx}
+              className="sleep-segment"
+              style={{
+                left: `${startPct}%`,
+                width: `${widthPct}%`,
+                backgroundColor: color,
+              }}
+              title={`${seg.type}: ${formatHour(seg.start)} - ${formatHour(
+                seg.end
+              )}`}
+            />
+          );
+        })}
       </div>
       <span className="sleep-total-hours">{totalSleepHours} hrs</span>
     </div>
   );
 }
 
-export default function SleepProgress() {
+export default function SleepLogs() {
   const navigate = useNavigate();
   const { token } = useAuth();
-
   const {
     data: rawSleepLogs,
     loading,
     error,
   } = useQuery("/sleep_logs", "sleep_logs");
 
-  const sleepLogs = rawSleepLogs || [];
+  const [logs, setLogs] = useState(rawSleepLogs || []);
+  const [toastMessage, setToastMessage] = useState("");
+  const lastMilestoneRef = useRef("");
 
-  const todayStr = new Date().toLocaleDateString("en-CA");
+  const today = new Date();
+  const todayStr = new Date(today.getTime() - today.getTimezoneOffset() * 60000)
+    .toISOString()
+    .split("T")[0];
 
-  if (!token) {
-    return (
-      <div className="sleep-page-container">
-        <h1 className="text-2xl font-bold mb-6">Sleep Log</h1>
-        <p>Please sign in to view your sleep logs.</p>
-      </div>
-    );
-  }
+  useEffect(() => {
+    setLogs(rawSleepLogs || []);
+  }, [rawSleepLogs]);
 
-  if (loading) {
-    return (
-      <div className="sleep-page-container">
-        <h1 className="text-2xl font-bold mb-6">Sleep Log</h1>
-        <p>Loading sleep logs...</p>
-      </div>
-    );
-  }
+  if (!token) return <p>Please sign in to view your sleep logs.</p>;
+  if (loading) return <p>Loading sleep logs...</p>;
+  if (error) return <p className="text-red-500">Error: {error}</p>;
 
-  if (error) {
-    return (
-      <div className="sleep-page-container">
-        <h1 className="text-2xl font-bold mb-6">Sleep Logs</h1>
-        <p className="text-red-500">Error loading sleep logs: {error}</p>
-      </div>
-    );
-  }
-
-  function fillMissingDates(logs) {
+  const fillMissingDates = (logsArray) => {
     const result = [];
-
-    const today = new Date();
     const year = today.getFullYear();
     const month = today.getMonth();
-
     const lastDay = new Date(year, month + 1, 0);
 
     for (let day = 1; day <= lastDay.getDate(); day++) {
       const d = new Date(year, month, day);
-      const dateStr = d.toLocaleDateString("en-CA");
+      const dateStr = d.toISOString().split("T")[0];
 
-      const segments = logs
-        .filter((log) => {
-          const logDate = new Date(log.date);
-          const logDateStr = logDate.toLocaleDateString("en-CA");
-          return logDateStr === dateStr;
-        })
+      const segments = logsArray
+        .filter((log) => log.date.split("T")[0] === dateStr)
         .map((log) => {
           const startTime = new Date(log.start_time);
           const endTime = new Date(log.end_time);
-
-          const startH = startTime.getHours();
-          const startM = startTime.getMinutes();
-          const endH = endTime.getHours();
-          const endM = endTime.getMinutes();
-
-          let startHour = startH + startM / 60;
-          let endHour = endH + endM / 60;
+          let startHour = startTime.getHours() + startTime.getMinutes() / 60;
+          let endHour = endTime.getHours() + endTime.getMinutes() / 60;
           if (endHour <= startHour) endHour += 24;
 
           return {
             start: startHour,
             end: endHour,
             type: log.sleep_type,
-            duration:
-              endHour - startHour < 0
-                ? endHour - startHour + 24
-                : endHour - startHour,
+            duration: endHour - startHour,
           };
         });
 
       result.push({ day: d, segments });
     }
-
     return result;
-  }
+  };
 
-  const days = fillMissingDates(sleepLogs);
+  const days = fillMissingDates(logs);
 
   const totalHours = days.reduce(
-    (sum, d) => sum + d.segments.reduce((segSum, s) => segSum + s.duration, 0),
+    (sum, d) => sum + d.segments.reduce((s, seg) => s + seg.duration, 0),
     0
   );
   const avgHours = (totalHours / days.length).toFixed(1);
 
-  const currentMonthName = new Date().toLocaleDateString("en-US", {
+  // Hardcoded encouragements
+  const encouragementMessages = {
+    "1Sleep": "Great! You logged your first sleep of the day.",
+    "3Sleep": "Nice streak! 3 sleep sessions logged today.",
+    "5Sleep": "Keep it up! 5 sessions in a month.",
+  };
+
+  const handleSleepAdded = (newLog) => {
+    setLogs([...logs, newLog]);
+
+    const sleepsToday = [...logs, newLog].filter(
+      (log) => log.date.split("T")[0] === newLog.date.split("T")[0]
+    );
+
+    let milestoneKey = null;
+    if (sleepsToday.length >= 5) milestoneKey = "5Sleep";
+    else if (sleepsToday.length >= 3) milestoneKey = "3Sleep";
+    else if (sleepsToday.length >= 1) milestoneKey = "1Sleep";
+
+    if (milestoneKey && lastMilestoneRef.current !== milestoneKey) {
+      setToastMessage(encouragementMessages[milestoneKey]);
+      lastMilestoneRef.current = milestoneKey;
+    }
+  };
+
+  const currentMonthName = today.toLocaleDateString("en-US", {
     month: "long",
     year: "numeric",
   });
-  const summary = `${currentMonthName}`;
 
   return (
     <div className="sleep-page-container">
-      <h1 className="sleep">Sleep Log</h1>
+      <h1 className="text-2xl font-bold mb-6">Sleep Log</h1>
       <div className="sleep-progress-container">
         <div className="sleep-left-column">
           <button onClick={() => navigate("/dashboard")} className="sleep-btn">
             ⬅ Back to Dashboard
           </button>
-          <p className="font-bold mb-4">{summary}</p>
+          <p className="font-bold mb-4">{currentMonthName}</p>
         </div>
-
         <div className="sleep-right-column">
           <div className="sleep-grid mt-4">
             {days.map((d, idx) => (
@@ -174,11 +163,18 @@ export default function SleepProgress() {
                 key={idx}
                 day={d.day}
                 segments={d.segments}
-                isToday={d.day.toLocaleDateString("en-CA") === todayStr}
+                isToday={d.day.toISOString().split("T")[0] === todayStr}
               />
             ))}
           </div>
-          <SleepForm />
+
+          <SleepForm onAdded={handleSleepAdded} />
+
+          <Encouragement
+            message={toastMessage}
+            onClose={() => setToastMessage("")}
+          />
+
           <div className="sleepinfo">
             <p>
               <strong>Total:</strong> {totalHours.toFixed(1)} hours
@@ -187,7 +183,6 @@ export default function SleepProgress() {
               <strong>Average:</strong> {avgHours} hours
             </p>
           </div>
-
         </div>
       </div>
       <div className="mt-6">

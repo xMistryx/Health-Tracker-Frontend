@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import TipBox from "../../tip/Tip";
+import Encouragement from "../../encouragement/Encouragement";
 import axios from "axios";
 import "./WaterLogs.css";
 
@@ -39,10 +40,20 @@ export default function WaterLogs() {
   const navigate = useNavigate();
   const { token } = useAuth();
   const [waterLogs, setWaterLogs] = useState([]);
+  const [toastMessage, setToastMessage] = useState("");
+  const lastMilestoneRef = useRef("");
   const today = new Date();
   const todayStr = new Date(today.getTime() - today.getTimezoneOffset() * 60000)
     .toISOString()
     .split("T")[0];
+
+  // Hardcoded encouragements
+  const encouragementMessages = {
+    "1Glass": "Great! You drank your first glass today 💧",
+    "3Glasses": "Nice! 3 glasses so far today! 💧💧💧",
+    "5Glasses": "Awesome! 5 glasses today! Keep it up! 💧💧💧💧💧",
+    "8Glasses": "💧 Hydration champion! 8 glasses today!",
+  };
 
   // Fetch logs from backend
   const fetchLogs = async () => {
@@ -70,16 +81,30 @@ export default function WaterLogs() {
   const handleToggleWater = async (date, dropletIndex, fillState) => {
     const amount = fillState === "full" ? -8 : 8; // subtract if full, add if empty
 
-    // Optimistic UI
     setWaterLogs((prev) => {
       const idx = prev.findIndex((d) => d.date === date);
+      let updated;
       if (idx >= 0) {
-        const updated = [...prev];
+        updated = [...prev];
         updated[idx].total_oz = Math.max(0, updated[idx].total_oz + amount);
-        return updated;
       } else {
-        return [...prev, { date, total_oz: amount > 0 ? amount : 0 }];
+        updated = [...prev, { date, total_oz: amount > 0 ? amount : 0 }];
       }
+
+      // Calculate milestones
+      const waterToday = updated.find((d) => d.date === date)?.total_oz || 0;
+      let milestoneKey = null;
+      if (waterToday >= 64) milestoneKey = "8Glasses";
+      else if (waterToday >= 40) milestoneKey = "5Glasses";
+      else if (waterToday >= 24) milestoneKey = "3Glasses";
+      else if (waterToday >= 8) milestoneKey = "1Glass";
+
+      if (milestoneKey && lastMilestoneRef.current !== milestoneKey) {
+        setToastMessage(encouragementMessages[milestoneKey]);
+        lastMilestoneRef.current = milestoneKey;
+      }
+
+      return updated;
     });
 
     try {
@@ -88,7 +113,7 @@ export default function WaterLogs() {
         { date, amount_oz: amount },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      fetchLogs(); // sync with backend
+      fetchLogs();
     } catch (err) {
       console.error("Error updating water:", err);
     }
@@ -147,6 +172,12 @@ export default function WaterLogs() {
               />
             ))}
           </div>
+
+          <Encouragement
+            message={toastMessage}
+            onClose={() => setToastMessage("")}
+          />
+
           <div className="waterinfo">
             <p>
               <strong>Total:</strong> {total} oz
@@ -157,6 +188,7 @@ export default function WaterLogs() {
           </div>
         </div>
       </div>
+
       <div className="mt-6">
         <TipBox category={["Water", "Electrolytes"]} />
       </div>

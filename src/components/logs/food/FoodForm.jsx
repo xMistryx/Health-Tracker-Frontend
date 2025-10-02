@@ -2,7 +2,7 @@ import { useRef } from "react";
 import useMutation from "../../api/useMutation";
 import "./FoodForm.css";
 
-export default function FoodForm() {
+export default function FoodForm({ onAdded }) {
   const { mutate, loading, error } = useMutation("POST", "/food_logs", [
     "food_logs",
   ]);
@@ -15,105 +15,70 @@ export default function FoodForm() {
     .toISOString()
     .split("T")[0];
 
-  const AddFood = async (formData) => {
-    const date = formData.get("date");
-    const food_item = formData.get("food_item");
-    const calories = formData.get("calories");
-    const protein = formData.get("protein");
-    const carbs = formData.get("carbs");
-    const fat = formData.get("fat");
-    const fiber = formData.get("fiber");
+  const handleAddFood = async (formData) => {
+    const newLog = {
+      date: formData.get("date"),
+      food_item: formData.get("food_item"),
+      calories: Number(formData.get("calories")) || 0,
+      protein: Number(formData.get("protein")) || 0,
+      carbs: Number(formData.get("carbs")) || 0,
+      fat: Number(formData.get("fat")) || 0,
+      fiber: Number(formData.get("fiber")) || 0,
+    };
 
-    const result = await mutate({
-      date,
-      food_item,
-      calories: Number(calories),
-      protein: Number(protein),
-      carbs: Number(carbs),
-      fat: Number(fat),
-      fiber: Number(fiber),
-    });
+    const result = await mutate(newLog);
+    console.log("FoodForm got result:", result, "error:", error);
 
-    if (result && !error) {
+    if (!error) {
       formRef.current?.reset();
+      if (onAdded) onAdded(result || newLog); // fallback to newLog
     }
   };
 
   return (
     <div className="form-block">
       <p>Add Food</p>
-      <form ref={formRef} action={AddFood} className="foodform">
+      <form
+        ref={formRef}
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleAddFood(new FormData(e.target));
+        }}
+        className="foodform"
+      >
         <div className="food-form-row">
           <label>
             Date:
-            <input
-              type="date"
-              name="date"
-              defaultValue={localToday}
-              className="dateinput"
-              required
-            />
+            <input type="date" name="date" defaultValue={localToday} required />
           </label>
           <label>
             Food Item:
-            <input
-              type="text"
-              name="food_item"
-              placeholder="Food"
-              className="foodinput"
-              required
-            />
+            <input type="text" name="food_item" placeholder="Food" required />
           </label>
           <label>
             Calories:
-            <input type="number" name="calories" min="0" placeholder="- - -" className="foodinput" />
+            <input type="number" name="calories" min="0" placeholder="- - -" />
           </label>
           <label>
             Protein (g):
-            <input
-              type="number"
-              name="protein"
-              min="0"
-              placeholder="- - -"
-              className="foodinput"
-            />
+            <input type="number" name="protein" min="0" placeholder="- - -" />
           </label>
         </div>
         <div className="food-form-row">
           <label>
             Carbs (g):
-            <input
-              type="number"
-              name="carbs"
-              min="0"
-              placeholder="- - -"
-              className="foodinput"
-            />
+            <input type="number" name="carbs" min="0" placeholder="- - -" />
           </label>
           <label>
             Fat (g):
-            <input
-              type="number"
-              name="fat"
-              min="0"
-              placeholder="- - -"
-              className="foodinput"
-            />
+            <input type="number" name="fat" min="0" placeholder="- - -" />
           </label>
           <label>
             Fiber (g):
-            <input
-              type="number"
-              name="fiber"
-              min="0"
-              placeholder="- - -"
-              className="foodinput"
-            />
+            <input type="number" name="fiber" min="0" placeholder="- - -" />
           </label>
         </div>
-        <button disabled={loading} className="formbutton">
-          {loading ? "Adding..." : "Add Food"}
-        </button>
+        <button disabled={loading}>{loading ? "Adding..." : "Add Food"}</button>
         {error && <output>{error}</output>}
       </form>
     </div>
