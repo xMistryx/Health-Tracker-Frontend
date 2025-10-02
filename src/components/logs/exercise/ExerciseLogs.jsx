@@ -52,11 +52,20 @@ function ExerciseRow({ day, exercises, isToday }) {
 export default function ExerciseLogs() {
   const navigate = useNavigate();
   const { token } = useAuth();
+
+  // Logs
   const {
     data: rawExerciseLogs,
     loading,
     error,
   } = useQuery("/exercise_logs", "exercise_logs");
+
+  // Encouragements
+  const {
+    data: encouragements = [],
+    loading: encouragementsLoading,
+    error: encouragementsError,
+  } = useQuery("/encouragements", "encouragements");
 
   const [logs, setLogs] = useState(rawExerciseLogs || []);
   const [toastMessage, setToastMessage] = useState("");
@@ -109,32 +118,53 @@ export default function ExerciseLogs() {
     year: "numeric",
   });
 
-  // Encouragement messages
-  const encouragementMessages = {
-    "1Exercise": "Great start! Keep moving! 💪",
-    "3Exercises": "Awesome! You're building consistency!",
-    "5Exercises": "Wow! Your effort this week is paying off!",
-    "10Exercises": "Incredible! Your habits are unstoppable!",
-  };
-
   const handleExerciseAdded = (newLog) => {
     console.log("Exercise added:", newLog);
     const updatedLogs = [...logs, newLog];
     setLogs(updatedLogs);
 
+    // Example milestones based on type + duration
+    let milestoneKey = null;
+    if (
+      newLog.exercise_type === "Flexibility Training" &&
+      newLog.duration >= 15
+    ) {
+      milestoneKey = "Flexibility15";
+    } else if (
+      newLog.exercise_type === "Strength Training" &&
+      newLog.duration >= 30
+    ) {
+      milestoneKey = "Strength30";
+    } else if (newLog.exercise_type === "Cardio" && newLog.duration >= 20) {
+      milestoneKey = "Cardio20";
+    } else if (
+      newLog.exercise_type === "Balance Training" &&
+      newLog.duration >= 10
+    ) {
+      milestoneKey = "Balance10";
+    }
+
+    // Fallback: logs-based milestones
     const exercisesToday = updatedLogs.filter(
       (log) => log.date.split("T")[0] === newLog.date.split("T")[0]
     );
+    if (exercisesToday.length >= 10) milestoneKey = "10Logs";
+    else if (exercisesToday.length >= 5) milestoneKey = "5Logs";
+    else if (exercisesToday.length >= 1) milestoneKey = "1Log";
 
-    let milestoneKey = null;
-    if (exercisesToday.length >= 10) milestoneKey = "10Exercises";
-    else if (exercisesToday.length >= 5) milestoneKey = "5Exercises";
-    else if (exercisesToday.length >= 3) milestoneKey = "3Exercises";
-    else if (exercisesToday.length >= 1) milestoneKey = "1Exercise";
+    console.log("MilestoneKey chosen:", milestoneKey);
+    console.log("All encouragements:", encouragements);
 
     if (milestoneKey && lastMilestoneRef.current !== milestoneKey) {
-      setToastMessage(encouragementMessages[milestoneKey]);
-      lastMilestoneRef.current = milestoneKey;
+      const encouragement = encouragements.find(
+        (e) => e.category === "Exercise" && e.milestone === milestoneKey
+      );
+      console.log("Encouragement found:", encouragement);
+
+      if (encouragement) {
+        setToastMessage(encouragement.message);
+        lastMilestoneRef.current = milestoneKey;
+      }
     }
   };
 

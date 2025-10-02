@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import useQuery from "../../api/useQuery";
-import { Link } from "react-router-dom";
 import FoodForm from "./FoodForm";
 import TipBox from "../../tip/Tip";
 import Encouragement from "../../encouragement/Encouragement";
@@ -40,13 +39,21 @@ function FoodRow({ day, meals, isToday }) {
 export default function FoodLogs() {
   const navigate = useNavigate();
   const { token } = useAuth();
+
+  // Query food logs
   const {
     data: rawFoodLogs,
     loading,
     error,
   } = useQuery("/food_logs", "food_logs");
 
-  // Local logs state
+  // Query encouragements
+  const {
+    data: encouragements = [],
+    loading: encouragementsLoading,
+    error: encouragementsError,
+  } = useQuery("/encouragements", "encouragements");
+
   const [logs, setLogs] = useState(rawFoodLogs || []);
   const [toastMessage, setToastMessage] = useState("");
   const lastMilestoneRef = useRef("");
@@ -56,7 +63,6 @@ export default function FoodLogs() {
     .toISOString()
     .split("T")[0];
 
-  // Sync query data into local state
   useEffect(() => {
     setLogs(rawFoodLogs || []);
   }, [rawFoodLogs]);
@@ -66,7 +72,6 @@ export default function FoodLogs() {
   if (error)
     return <p className="text-red-500">Error loading food logs: {error}</p>;
 
-  // Fill missing dates
   const fillMissingDates = (logsArray) => {
     const result = [];
     const year = today.getFullYear();
@@ -93,33 +98,35 @@ export default function FoodLogs() {
     year: "numeric",
   });
 
-  // Hardcoded encouragements
-  const encouragementMessages = {
-    "3Meals": "Balanced and fueled! You took great care of yourself today.",
-    "5Logs": "That’s a week of food awareness!",
-    "10Logs": "Nice! You’re really building healthy habits.",
-    "20Logs": "20 logs—your future self is proud!",
-  };
-
   // Handle new food added
   const handleFoodAdded = (newLog) => {
-    console.log("Food added:", newLog); // this should show in console
-    setToastMessage("Great job! Keep tracking your meals 💪");
+    console.log("Food added:", newLog);
     const updatedLogs = [...logs, newLog];
     setLogs(updatedLogs);
 
     const mealsToday = updatedLogs.filter(
       (log) => log.date.split("T")[0] === newLog.date.split("T")[0]
     );
+
     let milestoneKey = null;
     if (mealsToday.length >= 20) milestoneKey = "20Logs";
     else if (mealsToday.length >= 10) milestoneKey = "10Logs";
     else if (mealsToday.length >= 5) milestoneKey = "5Logs";
     else if (mealsToday.length >= 3) milestoneKey = "3Meals";
 
+    console.log("MilestoneKey chosen:", milestoneKey);
+    console.log("All encouragements:", encouragements);
+
     if (milestoneKey && lastMilestoneRef.current !== milestoneKey) {
-      setToastMessage(encouragementMessages[milestoneKey]);
-      lastMilestoneRef.current = milestoneKey;
+      const encouragement = encouragements.find(
+        (e) => e.category === "Food" && e.milestone === milestoneKey
+      );
+      console.log("Encouragement found:", encouragement);
+
+      if (encouragement) {
+        setToastMessage(encouragement.message);
+        lastMilestoneRef.current = milestoneKey;
+      }
     }
   };
 

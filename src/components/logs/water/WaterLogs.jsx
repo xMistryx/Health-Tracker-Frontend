@@ -40,6 +40,7 @@ export default function WaterLogs() {
   const navigate = useNavigate();
   const { token } = useAuth();
   const [waterLogs, setWaterLogs] = useState([]);
+  const [encouragements, setEncouragements] = useState([]);
   const [toastMessage, setToastMessage] = useState("");
   const lastMilestoneRef = useRef("");
   const today = new Date();
@@ -47,15 +48,7 @@ export default function WaterLogs() {
     .toISOString()
     .split("T")[0];
 
-  // Hardcoded encouragements
-  const encouragementMessages = {
-    "1Glass": "Great! You drank your first glass today 💧",
-    "3Glasses": "Nice! 3 glasses so far today! 💧💧💧",
-    "5Glasses": "Awesome! 5 glasses today! Keep it up! 💧💧💧💧💧",
-    "8Glasses": "💧 Hydration champion! 8 glasses today!",
-  };
-
-  // Fetch logs from backend
+  // Fetch water logs
   const fetchLogs = async () => {
     try {
       const res = await axios.get("http://localhost:3000/water_logs", {
@@ -73,13 +66,30 @@ export default function WaterLogs() {
     }
   };
 
+  // Fetch water encouragements from DB
+  const fetchEncouragements = async () => {
+    try {
+      const res = await axios.get(
+        "http://localhost:3000/encouragements?category=Water",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setEncouragements(res.data);
+      console.log("Water encouragements fetched:", res.data);
+    } catch (err) {
+      console.error("Error fetching water encouragements:", err);
+    }
+  };
+
   useEffect(() => {
-    if (token) fetchLogs();
+    if (token) {
+      fetchLogs();
+      fetchEncouragements();
+    }
   }, [token]);
 
   // Toggle water (add/remove)
   const handleToggleWater = async (date, dropletIndex, fillState) => {
-    const amount = fillState === "full" ? -8 : 8; // subtract if full, add if empty
+    const amount = fillState === "full" ? -8 : 8;
 
     setWaterLogs((prev) => {
       const idx = prev.findIndex((d) => d.date === date);
@@ -91,17 +101,23 @@ export default function WaterLogs() {
         updated = [...prev, { date, total_oz: amount > 0 ? amount : 0 }];
       }
 
-      // Calculate milestones
+      // Determine milestone dynamically from DB data
       const waterToday = updated.find((d) => d.date === date)?.total_oz || 0;
-      let milestoneKey = null;
-      if (waterToday >= 64) milestoneKey = "8Glasses";
-      else if (waterToday >= 40) milestoneKey = "5Glasses";
-      else if (waterToday >= 24) milestoneKey = "3Glasses";
-      else if (waterToday >= 8) milestoneKey = "1Glass";
+      let milestoneObj = null;
+      // Sort encouragements by milestone amount descending
+      const sortedEnc = [...encouragements].sort(
+        (a, b) => b.milestone - a.milestone || 0
+      );
+      for (const e of sortedEnc) {
+        if (waterToday >= Number(e.milestone.replace("oz", ""))) {
+          milestoneObj = e;
+          break;
+        }
+      }
 
-      if (milestoneKey && lastMilestoneRef.current !== milestoneKey) {
-        setToastMessage(encouragementMessages[milestoneKey]);
-        lastMilestoneRef.current = milestoneKey;
+      if (milestoneObj && lastMilestoneRef.current !== milestoneObj.milestone) {
+        setToastMessage(milestoneObj.message);
+        lastMilestoneRef.current = milestoneObj.milestone;
       }
 
       return updated;

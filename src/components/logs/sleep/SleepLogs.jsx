@@ -5,6 +5,7 @@ import useQuery from "../../api/useQuery";
 import SleepForm from "./SleepForm";
 import TipBox from "../../tip/Tip";
 import Encouragement from "../../encouragement/Encouragement";
+import axios from "axios";
 import "./SleepLogs.css";
 
 function formatHour(hourDecimal) {
@@ -53,6 +54,7 @@ function SleepRow({ day, segments, isToday }) {
 export default function SleepLogs() {
   const navigate = useNavigate();
   const { token } = useAuth();
+
   const {
     data: rawSleepLogs,
     loading,
@@ -60,6 +62,7 @@ export default function SleepLogs() {
   } = useQuery("/sleep_logs", "sleep_logs");
 
   const [logs, setLogs] = useState(rawSleepLogs || []);
+  const [encouragements, setEncouragements] = useState([]);
   const [toastMessage, setToastMessage] = useState("");
   const lastMilestoneRef = useRef("");
 
@@ -68,9 +71,27 @@ export default function SleepLogs() {
     .toISOString()
     .split("T")[0];
 
+  // Sync sleep logs
   useEffect(() => {
     setLogs(rawSleepLogs || []);
   }, [rawSleepLogs]);
+
+  // Fetch Sleep encouragements from backend
+  useEffect(() => {
+    const fetchEncouragements = async () => {
+      try {
+        const res = await axios.get(
+          "http://localhost:3000/encouragements?category=Sleep",
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setEncouragements(res.data);
+        console.log("Sleep encouragements fetched:", res.data);
+      } catch (err) {
+        console.error("Error fetching sleep encouragements:", err);
+      }
+    };
+    if (token) fetchEncouragements();
+  }, [token]);
 
   if (!token) return <p>Please sign in to view your sleep logs.</p>;
   if (loading) return <p>Loading sleep logs...</p>;
@@ -116,35 +137,42 @@ export default function SleepLogs() {
   );
   const avgHours = (totalHours / days.length).toFixed(1);
 
-  // Hardcoded encouragements
-  const encouragementMessages = {
-    "1Sleep": "Great! You logged your first sleep of the day.",
-    "3Sleep": "Nice streak! 3 sleep sessions logged today.",
-    "5Sleep": "Keep it up! 5 sessions in a month.",
-  };
-
-  const handleSleepAdded = (newLog) => {
-    setLogs([...logs, newLog]);
-
-    const sleepsToday = [...logs, newLog].filter(
-      (log) => log.date.split("T")[0] === newLog.date.split("T")[0]
-    );
-
-    let milestoneKey = null;
-    if (sleepsToday.length >= 5) milestoneKey = "5Sleep";
-    else if (sleepsToday.length >= 3) milestoneKey = "3Sleep";
-    else if (sleepsToday.length >= 1) milestoneKey = "1Sleep";
-
-    if (milestoneKey && lastMilestoneRef.current !== milestoneKey) {
-      setToastMessage(encouragementMessages[milestoneKey]);
-      lastMilestoneRef.current = milestoneKey;
-    }
-  };
-
   const currentMonthName = today.toLocaleDateString("en-US", {
     month: "long",
     year: "numeric",
   });
+
+  // Handle new sleep added
+  const handleSleepAdded = (newLog) => {
+    console.log("Sleep added:", newLog);
+    const updatedLogs = [...logs, newLog];
+    setLogs(updatedLogs);
+
+    const sleepsToday = updatedLogs.filter(
+      (log) => log.date.split("T")[0] === newLog.date.split("T")[0]
+    );
+
+    // Determine milestone
+    let milestoneKey = null;
+    if (sleepsToday.length >= 20) milestoneKey = "20Logs";
+    else if (sleepsToday.length >= 10) milestoneKey = "10Logs";
+    else if (sleepsToday.length >= 5) milestoneKey = "5Logs";
+    else if (newLog.sleep_type === "Nap") milestoneKey = "Nap";
+    else if (newLog.sleep_type === "FullNight") milestoneKey = "FullNight";
+    else if (newLog.sleep_type === "Sleep") milestoneKey = "FirstLog";
+
+    console.log("MilestoneKey chosen:", milestoneKey);
+
+    const encouragementObj = encouragements.find(
+      (e) => e.milestone === milestoneKey
+    );
+    console.log("Encouragement found:", encouragementObj);
+
+    if (encouragementObj && lastMilestoneRef.current !== milestoneKey) {
+      setToastMessage(encouragementObj.message);
+      lastMilestoneRef.current = milestoneKey;
+    }
+  };
 
   return (
     <div className="sleep-page-container">
