@@ -23,7 +23,8 @@ export default function ProfilePage() {
     <div className="profile-container">
       {healthInfo && !editing ? (
         <div>
-          <h2>Your Health Info</h2>
+          <h2>{healthInfo.username}</h2>
+          <h3>Health Info</h3>
           <p>Height: {healthInfo.height} in</p>
           <p>Weight: {healthInfo.weight} lbs</p>
           <p>Age: {healthInfo.age}</p>

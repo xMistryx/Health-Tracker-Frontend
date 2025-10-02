@@ -5,7 +5,6 @@
 .food-progress-container {
   display: flex;
   flex-direction: column;
-  flex-wrap: wrap;
 }
 
 .food-left-column {
@@ -68,8 +67,11 @@
   border-radius: 4px;
   background: #d9a48f;
   font-size: 0.9rem;
-  color: #fff;
+  color: #e8e6e1;
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  user-select: none;
 }
 
 .food-meal-block.intensity-1 {
@@ -118,7 +120,7 @@
 
 .food-recipes-link {
   display: inline-block;
-  font-size: .95rem;
+  font-size: 0.95rem;
   font-style: italic;
   color: #6fa49c;
   text-decoration: none;
@@ -185,7 +187,7 @@
   }
 
   .foodinfo {
-  gap: 50px;
+    gap: 50px;
   }
 }
 
@@ -250,6 +252,6 @@
   }
 
   .foodinfo {
-  gap: 20px;
+    gap: 20px;
   }
 }

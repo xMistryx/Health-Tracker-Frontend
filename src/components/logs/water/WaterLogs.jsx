@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import TipBox from "../../tip/Tip";
+import Encouragement from "../../encouragement/Encouragement";
 import axios from "axios";
 import "./WaterLogs.css";
 
@@ -159,6 +160,9 @@ export default function WaterLogs() {
       </div>
       <div className="mt-6">
         <TipBox category={["Water", "Electrolytes"]} />
+      </div>
+      <div>
+        <Encouragement />
       </div>
     </div>
   );

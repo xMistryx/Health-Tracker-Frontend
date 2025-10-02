@@ -134,7 +134,12 @@ export default function RecipeDetails() {
             {successMsg}
           </div>
         )}
-        <h2>{recipe.title}</h2>
+        <div className="top-row">
+          <button onClick={() => navigate("/recipes")} className="food-btn">
+            ⬅
+          </button>
+          <h2>{recipe.title}</h2>
+        </div>
         {recipe.image_url && (
           <img
             src={recipe.image_url}
@@ -163,7 +168,7 @@ export default function RecipeDetails() {
         </div>
 
         <p className="madeby">
-          <strong>Added by:</strong> {recipe.created_by}
+          <strong>Added by:</strong> {recipe.username}
         </p>
         <div className="made">
           <p className="times">

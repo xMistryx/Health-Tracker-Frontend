@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import useQuery from "../../api/useQuery";
 import { Link } from "react-router-dom";
 import FoodForm from "./FoodForm";
 import TipBox from "../../tip/Tip";
+import FoodTooltip from "./FoodTooltip";
 import "./FoodLogs.css";
 
 const getIntensityClass = (mealIndex) => {
@@ -17,14 +18,7 @@ const getIntensityClass = (mealIndex) => {
 };
 
 function FoodRow({ day, meals, isToday }) {
-  const totalCalories = meals.reduce(
-    (sum, m) => sum + Number(m.calories || 0),
-    0
-  );
-  const totalProtein = meals.reduce(
-    (sum, m) => sum + Number(m.protein || 0),
-    0
-  );
+  const [activeTooltip, setActiveTooltip] = useState(null);
 
   return (
     <div className={`food-food-row ${isToday ? "today" : ""}`}>
@@ -34,9 +28,14 @@ function FoodRow({ day, meals, isToday }) {
           <div
             key={i}
             className={`food-meal-block ${getIntensityClass(i)}`}
-            title={`${meal.calories} cal, ${meal.protein}g protein, ${meal.carbs}g carbs, ${meal.fat}g fat, ${meal.fiber}g fiber`}
+            onClick={() => setActiveTooltip(activeTooltip === i ? null : i)}
           >
-            {meal.food_item}
+            <span className="meal-content">{meal.food_item}</span>
+            <FoodTooltip
+              meal={meal}
+              isActive={activeTooltip === i}
+              onClose={() => setActiveTooltip(null)}
+            />
           </div>
         ))}
       </div>
@@ -49,7 +48,11 @@ export default function FoodLogs() {
   const navigate = useNavigate();
   const { token } = useAuth();
 
-  const { data: rawFoodLogs, loading, error } = useQuery("/food_logs", "food_logs");
+  const {
+    data: rawFoodLogs,
+    loading,
+    error,
+  } = useQuery("/food_logs", "food_logs");
 
   const foodLogs = rawFoodLogs || [];
 
@@ -113,14 +116,7 @@ export default function FoodLogs() {
   const days = fillMissingDates(foodLogs);
 
   const totalMeals = days.reduce((sum, d) => sum + d.meals.length, 0);
-  const totalCalories = days.reduce(
-    (sum, d) =>
-      sum +
-      d.meals.reduce((mealSum, m) => mealSum + Number(m.calories || 0), 0),
-    0
-  );
   const avgMeals = (totalMeals / days.length).toFixed(1);
-  const avgCalories = (totalCalories / days.length).toFixed(0);
 
   const currentMonthName = new Date().toLocaleDateString("en-US", {
     month: "long",
@@ -150,7 +146,9 @@ export default function FoodLogs() {
               />
             ))}
           </div>
-          <Link to="/recipes" className="food-recipes-link">Not sure what to eat?</Link> 
+          <Link to="/recipes" className="food-recipes-link">
+            Not sure what to eat?
+          </Link>
           <FoodForm />
           <div className="foodinfo">
             <p>

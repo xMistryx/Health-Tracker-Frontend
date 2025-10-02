@@ -10,7 +10,7 @@ export default function useQuery(resource, tag) {
   const query = useCallback(async () => {
     setLoading(true);
     setError(null);
-    setData(undefined); 
+    setData(undefined);
     try {
       const result = await request(resource);
       setData(result);
@@ -30,6 +30,6 @@ export default function useQuery(resource, tag) {
   useEffect(() => {
     if (tag) provideTag(tag, query);
     query();
-  }, [resource, tag, query, provideTag]); 
-  return { data, loading, error };
+  }, [resource, tag, query, provideTag]);
+  return { data, loading, error, refetch: query };
 }

@@ -1,20 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import useQuery from "../../api/useQuery";
 import SleepForm from "./SleepForm";
 import TipBox from "../../tip/Tip";
+import SleepTooltip from "./SleepTooltip";
 import "./SleepLogs.css";
 
-function formatHour(hourDecimal) {
-  const h = Math.floor(hourDecimal % 24);
-  const m = Math.round((hourDecimal % 1) * 60);
-  const ampm = h >= 12 ? "PM" : "AM";
-  const hour12 = h % 12 === 0 ? 12 : h % 12;
-  return `${hour12}:${m.toString().padStart(2, "0")} ${ampm}`;
-}
-
 function SleepRow({ day, segments, isToday }) {
+  const [activeTooltip, setActiveTooltip] = useState(null);
   const totalSleepHours = segments
     .reduce((sum, s) => sum + s.duration, 0)
     .toFixed(1);
@@ -33,11 +27,16 @@ function SleepRow({ day, segments, isToday }) {
             left: `${startPct}%`,
             width: `${widthPct}%`,
             backgroundColor: color,
+            cursor: "pointer",
           }}
-          title={`${seg.type}: ${formatHour(seg.start)} - ${formatHour(
-            seg.end
-          )}`}
-        />
+          onClick={() => setActiveTooltip(activeTooltip === idx ? null : idx)}
+        >
+          <SleepTooltip
+            segment={seg}
+            isActive={activeTooltip === idx}
+            onClose={() => setActiveTooltip(null)}
+          />
+        </div>
       );
     });
 
@@ -126,6 +125,7 @@ export default function SleepProgress() {
           if (endHour <= startHour) endHour += 24;
 
           return {
+            id: log.id,
             start: startHour,
             end: endHour,
             type: log.sleep_type,
@@ -187,7 +187,6 @@ export default function SleepProgress() {
               <strong>Average:</strong> {avgHours} hours
             </p>
           </div>
-
         </div>
       </div>
       <div className="mt-6">

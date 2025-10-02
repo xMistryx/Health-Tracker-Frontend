@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import useQuery from "../../api/useQuery";
 import ExerciseForm from "./ExerciseForm";
 import TipBox from "../../tip/Tip";
+import ExerciseTooltip from "./ExerciseTooltip";
 import "./ExerciseLogs.css";
 
 const typeColors = {
@@ -15,6 +16,7 @@ const typeColors = {
 };
 
 function ExerciseRow({ day, exercises, isToday }) {
+  const [activeTooltip, setActiveTooltip] = useState(null);
   const totalMinutes = exercises.reduce((sum, e) => sum + e.duration, 0);
 
   return (
@@ -30,8 +32,14 @@ function ExerciseRow({ day, exercises, isToday }) {
               backgroundColor: typeColors[ex.type] || "#ccc",
               width: `${ex.duration}px`,
             }}
-            title={`${ex.type} - ${ex.duration} min`}
-          />
+            onClick={() => setActiveTooltip(activeTooltip === idx ? null : idx)}
+          >
+            <ExerciseTooltip
+              exercise={ex}
+              isActive={activeTooltip === idx}
+              onClose={() => setActiveTooltip(null)}
+            />
+          </div>
         ))}
       </div>
 
@@ -102,8 +110,12 @@ export default function ExerciseProgress() {
           (log) => new Date(log.date).toISOString().split("T")[0] === dateStr
         )
         .map((log) => ({
+          id: log.id,
           type: log.exercise_type,
+          exercise_type: log.exercise_type,
           duration: log.duration,
+          notes: log.notes,
+          date: log.date,
         }));
 
       result.push({ day: d, exercises });
@@ -163,7 +175,9 @@ export default function ExerciseProgress() {
         </div>
       </div>
       <div className="mt-6">
-        <TipBox category={["Exercise & Movement", "Rest & Recovery", "Balance"]} />
+        <TipBox
+          category={["Exercise & Movement", "Rest & Recovery", "Balance"]}
+        />
       </div>
     </div>
   );

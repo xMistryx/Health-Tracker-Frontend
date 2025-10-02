@@ -101,18 +101,13 @@ export default function RecipeForm() {
       setError("Please fill title, description and instructions.");
       return;
     }
-    if (!createdBy || !createdBy.trim()) {
-      setError("Please provide a username in the Created By field.");
-      return;
-    }
 
     const payload = {
-      title,
+      title: title.trim(),
       image_url: imageUrl || null,
       description,
       ingredients,
       instructions: instructionText,
-      created_by: createdBy.trim(),
     };
 
     try {
@@ -216,19 +211,6 @@ export default function RecipeForm() {
             onChange={(e) => setInstructionText(e.target.value)}
             required
           />
-        </div>
-
-        <div>
-          <label>
-            Created by (username)
-            <input
-              type="text"
-              value={createdBy}
-              onChange={(e) => setCreatedBy(e.target.value)}
-              placeholder="Username"
-              required
-            />
-          </label>
         </div>
 
         <div style={{ marginTop: 12 }}>

@@ -66,6 +66,16 @@
 .exercise-exercise-block {
   height: 20px;
   border-radius: 4px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  user-select: none;
+  position: relative;
+}
+
+.exercise-exercise-block.active-tooltip-trigger {
+  border: 2px solid #4f6b57 !important;
+  box-shadow: 0 0 8px rgba(79, 107, 87, 0.4);
 }
 
 .exercise-total-minutes {
@@ -98,7 +108,7 @@
   color: white;
 }
 
-.exercise-grid{
+.exercise-grid {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -137,7 +147,7 @@
   }
 
   .exerciseinfo {
-  gap: 40px;
+    gap: 40px;
   }
 }
 
@@ -169,6 +179,6 @@
   }
 
   .exerciseinfo {
-  gap: 20px;
+    gap: 20px;
   }
 }

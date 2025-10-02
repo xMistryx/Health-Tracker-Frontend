@@ -26,7 +26,7 @@ export function ApiProvider({ children }) {
       return result;
     },
     [token]
-  ); 
+  );
 
   const [tags, setTags] = useState({});
 
@@ -38,7 +38,9 @@ export function ApiProvider({ children }) {
     setTags((prevTags) => {
       tagsToInvalidate.forEach((tag) => {
         const query = prevTags[tag];
-        if (query) query();
+        if (query) {
+          setTimeout(query, 0);
+        }
       });
       return prevTags;
     });
