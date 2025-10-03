@@ -1,13 +1,14 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import useQuery from "../../api/useQuery";
-import { Link } from "react-router-dom";
 import FoodForm from "./FoodForm";
 import TipBox from "../../tip/Tip";
 import FoodTooltip from "./FoodTooltip";
+import Encouragement from "../../encouragement/Encouragement";
 import "./FoodLogs.css";
 
+// Get CSS intensity class for visual blocks
 const getIntensityClass = (mealIndex) => {
   if (mealIndex === 0) return "intensity-1";
   if (mealIndex === 1) return "intensity-2";
@@ -48,53 +49,87 @@ export default function FoodLogs() {
   const navigate = useNavigate();
   const { token } = useAuth();
 
+  // --- Fetch food logs & db encouragements ---
   const {
-    data: rawFoodLogs,
+    data: rawFoodLogs = [],
     loading,
     error,
   } = useQuery("/food_logs", "food_logs");
 
-  const foodLogs = rawFoodLogs || [];
+  const { data: dbEncouragements = [] } = useQuery(
+    "/encouragements?category=Food",
+    "encouragements"
+  );
 
-  const today = new Date();
-  const todayStr = new Date(today.getTime() - today.getTimezoneOffset() * 60000)
-    .toISOString()
-    .split("T")[0];
+  const [foodLogs, setFoodLogs] = useState([]);
+  const [encouragementMsg, setEncouragementMsg] = useState("");
+  const triggeredMilestonesRef = useRef(new Set());
 
-  if (!token) {
-    return (
-      <div className="food-page-container">
-        <h1 className="text-2xl font-bold mb-6">Food Log</h1>
-        <p>Please sign in to view your food logs.</p>
-      </div>
+  useEffect(() => {
+    setFoodLogs(rawFoodLogs || []);
+  }, [rawFoodLogs]);
+
+  // --- Local-only encouragements ---
+  const localFoodEncouragements = [
+    {
+      milestone: "FirstMeal",
+      message: "Great start! Your first meal sets the tone for the day.",
+    },
+    {
+      milestone: "SecondMeal",
+      message: "Two meals logged—you’re staying mindful!",
+    },
+  ];
+
+  const allFoodEncouragements = [
+    ...dbEncouragements,
+    ...localFoodEncouragements,
+  ];
+
+  // --- Handle food added ---
+  const handleFoodAdded = (newLog) => {
+    const updatedLogs = [...foodLogs, newLog];
+    setFoodLogs(updatedLogs);
+
+    // Count meals for the date of the new log
+    const dateStr = newLog.date.split("T")[0];
+    const todaysLogs = updatedLogs.filter(
+      (log) => log.date.split("T")[0] === dateStr
     );
-  }
+    const logsCount = todaysLogs.length; // only today
 
-  if (loading) {
-    return (
-      <div className="food-page-container">
-        <h1 className="text-2xl font-bold mb-6">Food Log</h1>
-        <p>Loading food logs...</p>
-      </div>
+    let milestoneKey = null;
+
+    // Local milestones for first and second meal of the day
+    if (logsCount === 1) milestoneKey = "FirstMeal";
+    else if (logsCount === 2) milestoneKey = "SecondMeal";
+    else if (logsCount === 3) milestoneKey = "3Meals";
+
+    // DB milestones based on cumulative logs
+    const totalLogs = updatedLogs.length;
+    if (totalLogs === 5) milestoneKey = "5Logs";
+    else if (totalLogs === 10) milestoneKey = "10Logs";
+    else if (totalLogs === 20) milestoneKey = "20Logs";
+
+    if (!milestoneKey || triggeredMilestonesRef.current.has(milestoneKey))
+      return;
+
+    const milestoneEncouragement = allFoodEncouragements.find(
+      (e) => e.milestone === milestoneKey
     );
-  }
 
-  if (error) {
-    return (
-      <div className="food-page-container">
-        <h1 className="text-2xl font-bold mb-6">Food Logs</h1>
-        <p className="text-red-500">Error loading food logs: {error}</p>
-      </div>
-    );
-  }
+    if (milestoneEncouragement) {
+      setEncouragementMsg(milestoneEncouragement.message);
+      triggeredMilestonesRef.current.add(milestoneKey);
+    }
+  };
 
-  function fillMissingDates(logs) {
+  // --- Fill missing dates with meals ---
+  const fillMissingDates = (logs) => {
     const result = [];
-
     const today = new Date();
     const year = today.getFullYear();
     const month = today.getMonth();
-
     const lastDay = new Date(year, month + 1, 0);
 
     for (let day = 1; day <= lastDay.getDate(); day++) {
@@ -102,27 +137,28 @@ export default function FoodLogs() {
       const dateStr = d.toISOString().split("T")[0];
 
       const meals = logs
-        .filter(
-          (log) => new Date(log.date).toISOString().split("T")[0] === dateStr
-        )
+        .filter((log) => log.date.split("T")[0] === dateStr)
         .sort((a, b) => a.id - b.id);
 
       result.push({ day: d, meals });
     }
-
     return result;
-  }
+  };
 
   const days = fillMissingDates(foodLogs);
 
   const totalMeals = days.reduce((sum, d) => sum + d.meals.length, 0);
   const avgMeals = (totalMeals / days.length).toFixed(1);
 
+  const todayStr = new Date().toISOString().split("T")[0];
   const currentMonthName = new Date().toLocaleDateString("en-US", {
     month: "long",
     year: "numeric",
   });
-  const summary = `${currentMonthName}`;
+
+  if (!token) return <p>Please sign in to view your food logs.</p>;
+  if (loading) return <p>Loading food logs...</p>;
+  if (error) return <p className="text-red-500">Error: {error}</p>;
 
   return (
     <div className="food-page-container">
@@ -132,7 +168,7 @@ export default function FoodLogs() {
           <button onClick={() => navigate("/dashboard")} className="food-btn">
             ⬅ Back to Dashboard
           </button>
-          <p className="font-bold mb-4">{summary}</p>
+          <p className="font-bold mb-4">{currentMonthName}</p>
         </div>
 
         <div className="food-right-column">
@@ -146,10 +182,13 @@ export default function FoodLogs() {
               />
             ))}
           </div>
+
           <Link to="/recipes" className="food-recipes-link">
             Not sure what to eat?
           </Link>
-          <FoodForm />
+
+          <FoodForm onAdded={handleFoodAdded} />
+
           <div className="foodinfo">
             <p>
               <strong>Total:</strong> {totalMeals} meals
@@ -160,6 +199,14 @@ export default function FoodLogs() {
           </div>
         </div>
       </div>
+
+      {encouragementMsg && (
+        <Encouragement
+          message={encouragementMsg}
+          onClose={() => setEncouragementMsg("")}
+        />
+      )}
+
       <div className="mt-6">
         <TipBox category={["Food & Nourishment", "Electrolytes"]} />
       </div>

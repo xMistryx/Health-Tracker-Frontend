@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import TipBox from "../../tip/Tip";
@@ -40,12 +40,15 @@ export default function WaterLogs() {
   const navigate = useNavigate();
   const { token } = useAuth();
   const [waterLogs, setWaterLogs] = useState([]);
+  const [encouragementMsg, setEncouragementMsg] = useState("");
+  const triggeredRef = useRef(new Set());
+  const [encouragements, setEncouragements] = useState([]);
   const today = new Date();
   const todayStr = new Date(today.getTime() - today.getTimezoneOffset() * 60000)
     .toISOString()
     .split("T")[0];
 
-  // Fetch logs from backend
+  // Fetch water logs
   const fetchLogs = async () => {
     try {
       const res = await axios.get("http://localhost:3000/water_logs", {
@@ -63,13 +66,31 @@ export default function WaterLogs() {
     }
   };
 
+  // Fetch encouragements from DB
+  const fetchEncouragements = async () => {
+    try {
+      const res = await axios.get(
+        "http://localhost:3000/encouragements?category=Water",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setEncouragements(res.data || []);
+    } catch (err) {
+      console.error("Error fetching water encouragements:", err);
+    }
+  };
+
   useEffect(() => {
-    if (token) fetchLogs();
+    if (token) {
+      fetchLogs();
+      fetchEncouragements();
+    }
   }, [token]);
 
   // Toggle water (add/remove)
   const handleToggleWater = async (date, dropletIndex, fillState) => {
-    const amount = fillState === "full" ? -8 : 8; // subtract if full, add if empty
+    const amount = fillState === "full" ? -8 : 8;
 
     // Optimistic UI
     setWaterLogs((prev) => {
@@ -89,7 +110,25 @@ export default function WaterLogs() {
         { date, amount_oz: amount },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
       fetchLogs(); // sync with backend
+
+      // Check milestones dynamically
+      const newTotal =
+        (waterLogs.find((d) => d.date === date)?.total_oz || 0) + amount;
+
+      const milestone = encouragements.find(
+        (e) =>
+          !triggeredRef.current.has(e.milestone) &&
+          ((e.milestone === "FirstLog" && newTotal >= 8) ||
+            (e.milestone === "32oz" && newTotal >= 32) ||
+            (e.milestone === "68oz" && newTotal >= 68))
+      );
+
+      if (milestone) {
+        setEncouragementMsg(milestone.message);
+        triggeredRef.current.add(milestone.milestone);
+      }
     } catch (err) {
       console.error("Error updating water:", err);
     }
@@ -148,6 +187,7 @@ export default function WaterLogs() {
               />
             ))}
           </div>
+
           <div className="waterinfo">
             <p>
               <strong>Total:</strong> {total} oz
@@ -158,11 +198,16 @@ export default function WaterLogs() {
           </div>
         </div>
       </div>
+
+      {encouragementMsg && (
+        <Encouragement
+          message={encouragementMsg}
+          onClose={() => setEncouragementMsg("")}
+        />
+      )}
+
       <div className="mt-6">
         <TipBox category={["Water", "Electrolytes"]} />
-      </div>
-      <div>
-        <Encouragement />
       </div>
     </div>
   );

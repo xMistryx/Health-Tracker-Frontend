@@ -2,7 +2,7 @@ import { useRef } from "react";
 import useMutation from "../../api/useMutation";
 import "./ExerciseForm.css";
 
-export default function ExerciseForm() {
+export default function ExerciseForm({ onAdded }) {
   const { mutate, loading, error } = useMutation("POST", "/exercise_logs", [
     "exercise_logs",
   ]);
@@ -15,43 +15,40 @@ export default function ExerciseForm() {
     .toISOString()
     .split("T")[0];
 
-  const AddExercise = async (formData) => {
-    const date = formData.get("date");
-    const exercise_type = formData.get("exercise_type");
-    const duration = formData.get("duration");
+  const handleAddExercise = async (formData) => {
+    const newExercise = {
+      date: formData.get("date"),
+      exercise_type: formData.get("exercise_type"),
+      duration: Number(formData.get("duration")),
+    };
 
-    const result = await mutate({
-      date,
-      exercise_type,
-      duration,
-    });
+    const result = await mutate(newExercise);
+    console.log("ExerciseForm got result:", result, "error:", error);
 
-    if (result && !error) {
+    if (!error) {
       formRef.current?.reset();
+      if (onAdded) onAdded(result || newExercise); // fallback to newExercise
     }
   };
 
   return (
     <div className="form-block">
       <p>Add Exercise</p>
-      <form ref={formRef} action={AddExercise} className="exerciseform">
+      <form
+        ref={formRef}
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleAddExercise(new FormData(e.target));
+        }}
+        className="exerciseform"
+      >
         <label>
           Date:
-          <input
-            type="date"
-            name="date"
-            defaultValue={localToday}
-            className="dateinput"
-            required
-          />
+          <input type="date" name="date" defaultValue={localToday} required />
         </label>
         <label>
           Type:
-          <select
-            name="exercise_type"
-            defaultValue="Stretching"
-            className="exerciseselect"
-          >
+          <select name="exercise_type" defaultValue="Stretching">
             <option value="Stretching">Stretching</option>
             <option value="Cardio">Cardio</option>
             <option value="Strength Training">Strength Training</option>
@@ -63,7 +60,7 @@ export default function ExerciseForm() {
           Duration:
           <input type="number" name="duration" placeholder="- - -" required />
         </label>
-        <button disabled={loading} className="formbutton">
+        <button disabled={loading}>
           {loading ? "Adding..." : "Add Exercise"}
         </button>
         {error && <output>{error}</output>}

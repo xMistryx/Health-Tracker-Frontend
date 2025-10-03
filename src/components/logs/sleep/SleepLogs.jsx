@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import useQuery from "../../api/useQuery";
 import SleepForm from "./SleepForm";
 import TipBox from "../../tip/Tip";
 import SleepTooltip from "./SleepTooltip";
+import Encouragement from "../../encouragement/Encouragement";
 import "./SleepLogs.css";
 
 function SleepRow({ day, segments, isToday }) {
@@ -51,54 +52,41 @@ function SleepRow({ day, segments, isToday }) {
   );
 }
 
-export default function SleepProgress() {
+export default function SleepLogs() {
   const navigate = useNavigate();
   const { token } = useAuth();
 
   const {
-    data: rawSleepLogs,
+    data: rawSleepLogs = [],
     loading,
     error,
   } = useQuery("/sleep_logs", "sleep_logs");
 
-  const sleepLogs = rawSleepLogs || [];
+  const { data: encouragements = [] } = useQuery(
+    "/encouragements?category=Sleep",
+    "encouragements"
+  );
+
+  const [sleepLogs, setSleepLogs] = useState([]);
+  const [encouragementMsg, setEncouragementMsg] = useState("");
+  const triggeredMilestonesRef = useRef(new Set());
+
+  useEffect(() => {
+    setSleepLogs(rawSleepLogs);
+  }, [rawSleepLogs]);
 
   const todayStr = new Date().toLocaleDateString("en-CA");
 
-  if (!token) {
-    return (
-      <div className="sleep-page-container">
-        <h1 className="text-2xl font-bold mb-6">Sleep Log</h1>
-        <p>Please sign in to view your sleep logs.</p>
-      </div>
-    );
-  }
+  if (!token) return <p>Please sign in to view your sleep logs.</p>;
+  if (loading) return <p>Loading sleep logs...</p>;
+  if (error) return <p className="text-red-500">Error: {error}</p>;
 
-  if (loading) {
-    return (
-      <div className="sleep-page-container">
-        <h1 className="text-2xl font-bold mb-6">Sleep Log</h1>
-        <p>Loading sleep logs...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="sleep-page-container">
-        <h1 className="text-2xl font-bold mb-6">Sleep Logs</h1>
-        <p className="text-red-500">Error loading sleep logs: {error}</p>
-      </div>
-    );
-  }
-
-  function fillMissingDates(logs) {
+  // Fill missing dates for display
+  const fillMissingDates = (logs) => {
     const result = [];
-
     const today = new Date();
     const year = today.getFullYear();
     const month = today.getMonth();
-
     const lastDay = new Date(year, month + 1, 0);
 
     for (let day = 1; day <= lastDay.getDate(); day++) {
@@ -106,22 +94,14 @@ export default function SleepProgress() {
       const dateStr = d.toLocaleDateString("en-CA");
 
       const segments = logs
-        .filter((log) => {
-          const logDate = new Date(log.date);
-          const logDateStr = logDate.toLocaleDateString("en-CA");
-          return logDateStr === dateStr;
-        })
+        .filter(
+          (log) => new Date(log.date).toLocaleDateString("en-CA") === dateStr
+        )
         .map((log) => {
           const startTime = new Date(log.start_time);
           const endTime = new Date(log.end_time);
-
-          const startH = startTime.getHours();
-          const startM = startTime.getMinutes();
-          const endH = endTime.getHours();
-          const endM = endTime.getMinutes();
-
-          let startHour = startH + startM / 60;
-          let endHour = endH + endM / 60;
+          let startHour = startTime.getHours() + startTime.getMinutes() / 60;
+          let endHour = endTime.getHours() + endTime.getMinutes() / 60;
           if (endHour <= startHour) endHour += 24;
 
           return {
@@ -140,7 +120,7 @@ export default function SleepProgress() {
     }
 
     return result;
-  }
+  };
 
   const days = fillMissingDates(sleepLogs);
 
@@ -154,7 +134,42 @@ export default function SleepProgress() {
     month: "long",
     year: "numeric",
   });
-  const summary = `${currentMonthName}`;
+
+  // --- DYNAMIC ENCOURAGEMENTS ON EVERY ENTRY ---
+  const handleSleepAdded = (newLog) => {
+    const updatedLogs = [...sleepLogs, newLog];
+    setSleepLogs(updatedLogs);
+
+    let milestoneKey = null;
+    const logsCount = updatedLogs.length;
+
+    // Type-based milestones
+    if (newLog.sleep_type === "Nap") milestoneKey = "Nap";
+    else if (newLog.sleep_type === "FullNight") milestoneKey = "FullNight";
+    else if (logsCount === 1) milestoneKey = "FirstLog";
+
+    // Count-based milestones
+    if (logsCount === 5) milestoneKey = "5Logs";
+    else if (logsCount === 10) milestoneKey = "10Logs";
+    else if (logsCount === 20) milestoneKey = "20Logs";
+    else {
+      milestoneKey = "FirstLog";
+    }
+
+    // Skip if milestone already triggered
+    if (!milestoneKey || triggeredMilestonesRef.current.has(milestoneKey))
+      return;
+
+    const milestoneEncouragement = encouragements.find(
+      (e) => e.category === "Sleep" && e.milestone === milestoneKey
+    );
+
+    if (milestoneEncouragement) {
+      setEncouragementMsg(milestoneEncouragement.message);
+      triggeredMilestonesRef.current.add(milestoneKey);
+    }
+  };
+  // --- END HANDLE SLEEP ADDED ---
 
   return (
     <div className="sleep-page-container">
@@ -164,7 +179,7 @@ export default function SleepProgress() {
           <button onClick={() => navigate("/dashboard")} className="sleep-btn">
             ⬅ Back to Dashboard
           </button>
-          <p className="font-bold mb-4">{summary}</p>
+          <p className="font-bold mb-4">{currentMonthName}</p>
         </div>
 
         <div className="sleep-right-column">
@@ -178,7 +193,9 @@ export default function SleepProgress() {
               />
             ))}
           </div>
-          <SleepForm />
+
+          <SleepForm onAdded={handleSleepAdded} />
+
           <div className="sleepinfo">
             <p>
               <strong>Total:</strong> {totalHours.toFixed(1)} hours
@@ -189,6 +206,14 @@ export default function SleepProgress() {
           </div>
         </div>
       </div>
+
+      {encouragementMsg && (
+        <Encouragement
+          message={encouragementMsg}
+          onClose={() => setEncouragementMsg("")}
+        />
+      )}
+
       <div className="mt-6">
         <TipBox category={["Sleep", "Naps", "Sunlight"]} />
       </div>

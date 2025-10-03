@@ -2,7 +2,7 @@ import { useRef } from "react";
 import useMutation from "../../api/useMutation";
 import "./SleepForm.css";
 
-export default function SleepForm() {
+export default function SleepForm({ onAdded }) {
   const { mutate, loading, error } = useMutation("POST", "/sleep_logs", [
     "sleep_logs",
   ]);
@@ -23,67 +23,64 @@ export default function SleepForm() {
       end.setDate(end.getDate() + 1);
     }
 
-    return Math.round((end - start) / (1000 * 60));
+    return Math.round((end - start) / (1000 * 60)); // duration in minutes
   };
 
-  const AddSleep = async (formData) => {
+  const handleAddSleep = async (formData) => {
     const date = formData.get("date");
     const sleep_type = formData.get("sleep_type");
     const start_time = formData.get("start_time");
     const end_time = formData.get("end_time");
     const duration = calculateDuration(start_time, end_time);
 
-    const result = await mutate({
-      date,
-      sleep_type,
-      start_time,
-      end_time,
-      duration,
-    });
+    const newSleepLog = { date, sleep_type, start_time, end_time, duration };
 
-    if (result && !error) {
+    const result = await mutate(newSleepLog);
+    console.log("SleepForm got result:", result, "error:", error);
+
+    if (!error) {
       formRef.current?.reset();
+      if (onAdded) onAdded(result || newSleepLog); // notify parent
     }
   };
 
   return (
     <div className="form-block">
       <p>Add Sleep</p>
-      <form ref={formRef} action={AddSleep} className="sleepform">
-      <div className="form-row">
-        <label>
-          Date:
-          <input
-            type="date"
-            name="date"
-            defaultValue={localToday}
-            className="dateinput"
-            required
-          />
-        </label>
-        <label>
-          Type:
-          <select
-            name="sleep_type"
-            defaultValue="Sleep"
-            className="sleepselect"
-          >
-            <option value="Sleep">Sleep</option>
-            <option value="Nap">Nap</option>
-          </select>
-        </label>
-        </div>
+      <form
+        ref={formRef}
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleAddSleep(new FormData(e.target));
+        }}
+        className="sleepform"
+      >
         <div className="form-row">
-        <label>
-          Start Time:
-          <input type="time" name="start_time" required />
-        </label>
-        <label>
-          End Time:
-          <input type="time" name="end_time" required />
-        </label>
+          <label>
+            Date:
+            <input type="date" name="date" defaultValue={localToday} required />
+          </label>
+          <label>
+            Type:
+            <select name="sleep_type" defaultValue="Sleep">
+              <option value="Sleep">Sleep</option>
+              <option value="Nap">Nap</option>
+            </select>
+          </label>
         </div>
-        <button disabled={loading} className="formbutton">
+
+        <div className="form-row">
+          <label>
+            Start Time:
+            <input type="time" name="start_time" required />
+          </label>
+          <label>
+            End Time:
+            <input type="time" name="end_time" required />
+          </label>
+        </div>
+
+        <button disabled={loading}>
           {loading ? "Adding..." : "Add Sleep"}
         </button>
         {error && <output>{error}</output>}
