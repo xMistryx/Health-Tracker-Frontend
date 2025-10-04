@@ -24,7 +24,7 @@ export default function Dashboard({ user, onSignOut }) {
           type="date"
           value={date}
           onChange={(e) => {
-          setDate(e.target.value);
+            setDate(e.target.value);
           }}
         />
       </div>

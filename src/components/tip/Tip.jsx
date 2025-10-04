@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import useQuery from "../api/useQuery";
-import "./tip.css";
+import "./Tip.css";
 
 export default function TipBox({ category = "water" }) {
   const [tip, setTip] = useState("");
