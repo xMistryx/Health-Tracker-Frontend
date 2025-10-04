@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import TipBox from "../../tip/Tip";
@@ -41,7 +41,6 @@ export default function WaterLogs() {
   const { token } = useAuth();
   const [waterLogs, setWaterLogs] = useState([]);
   const [encouragementMsg, setEncouragementMsg] = useState("");
-  const triggeredRef = useRef(new Set());
   const [encouragements, setEncouragements] = useState([]);
   const today = new Date();
   const todayStr = new Date(today.getTime() - today.getTimezoneOffset() * 60000)
@@ -66,14 +65,12 @@ export default function WaterLogs() {
     }
   };
 
-  // Fetch encouragements from DB
+  // Fetch encouragements
   const fetchEncouragements = async () => {
     try {
       const res = await axios.get(
         "http://localhost:3000/encouragements?category=Water",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setEncouragements(res.data || []);
     } catch (err) {
@@ -88,20 +85,49 @@ export default function WaterLogs() {
     }
   }, [token]);
 
-  // Toggle water (add/remove)
+  // Dynamic encouragement based on ranges
+  const getWaterEncouragement = (total) => {
+    if (!encouragements || encouragements.length === 0) return "";
+
+    // Fallback ranges if backend doesn't send min_oz/max_oz
+    const ranges = {
+      FirstLog: [0, 31],
+      "32oz": [32, 67],
+      "68oz": [68, Infinity],
+    };
+
+    const milestone = encouragements.find((e) => {
+      const [min, max] = ranges[e.milestone] || [0, Infinity];
+      return total >= min && total <= max;
+    });
+
+    return milestone ? milestone.message : "";
+  };
+
+  // Toggle water
   const handleToggleWater = async (date, dropletIndex, fillState) => {
     const amount = fillState === "full" ? -8 : 8;
 
-    // Optimistic UI
     setWaterLogs((prev) => {
       const idx = prev.findIndex((d) => d.date === date);
+      let updated = [...prev];
+
       if (idx >= 0) {
-        const updated = [...prev];
-        updated[idx].total_oz = Math.max(0, updated[idx].total_oz + amount);
-        return updated;
+        const prevTotal = updated[idx].total_oz;
+        const newTotal = Math.max(0, prevTotal + amount);
+        updated[idx].total_oz = newTotal;
+
+        setEncouragementMsg(getWaterEncouragement(newTotal));
       } else {
-        return [...prev, { date, total_oz: amount > 0 ? amount : 0 }];
+        const newTotal = amount > 0 ? amount : 0;
+        updated.push({ date, total_oz: newTotal });
+
+        if (amount > 0) {
+          setEncouragementMsg(getWaterEncouragement(newTotal));
+        }
       }
+
+      return updated;
     });
 
     try {
@@ -110,31 +136,12 @@ export default function WaterLogs() {
         { date, amount_oz: amount },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      fetchLogs(); // sync with backend
-
-      // Check milestones dynamically
-      const newTotal =
-        (waterLogs.find((d) => d.date === date)?.total_oz || 0) + amount;
-
-      const milestone = encouragements.find(
-        (e) =>
-          !triggeredRef.current.has(e.milestone) &&
-          ((e.milestone === "FirstLog" && newTotal >= 8) ||
-            (e.milestone === "32oz" && newTotal >= 32) ||
-            (e.milestone === "68oz" && newTotal >= 68))
-      );
-
-      if (milestone) {
-        setEncouragementMsg(milestone.message);
-        triggeredRef.current.add(milestone.milestone);
-      }
+      fetchLogs();
     } catch (err) {
       console.error("Error updating water:", err);
     }
   };
 
-  // Fill missing days of the current month
   const fillMissingDates = (logs) => {
     const result = [];
     const year = today.getFullYear();

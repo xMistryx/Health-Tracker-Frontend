@@ -14,38 +14,37 @@ function SleepRow({ day, segments, isToday }) {
     .reduce((sum, s) => sum + s.duration, 0)
     .toFixed(1);
 
-  const renderSegments = (segs) =>
-    segs.map((seg, idx) => {
-      const startPct = (Math.max(seg.start, 0) / 24) * 100;
-      const widthPct =
-        ((Math.min(seg.end, 24) - Math.max(seg.start, 0)) / 24) * 100;
-      const color = seg.type === "Sleep" ? "#6FA49C" : "#9BC0B0";
-      return (
-        <div
-          key={idx}
-          className="sleep-segment"
-          style={{
-            left: `${startPct}%`,
-            width: `${widthPct}%`,
-            backgroundColor: color,
-            cursor: "pointer",
-          }}
-          onClick={() => setActiveTooltip(activeTooltip === idx ? null : idx)}
-        >
-          <SleepTooltip
-            segment={seg}
-            isActive={activeTooltip === idx}
-            onClose={() => setActiveTooltip(null)}
-          />
-        </div>
-      );
-    });
-
   return (
     <div className={`sleep-sleep-row ${isToday ? "today" : ""}`}>
       <span className="sleep-day-label">{day.getDate()}</span>
       <div className="sleep-timeline" style={{ height: "22px" }}>
-        {renderSegments(segments)}
+        {segments.map((seg, idx) => {
+          const startPct = (Math.max(seg.start, 0) / 24) * 100;
+          const widthPct =
+            ((Math.min(seg.end, 24) - Math.max(seg.start, 0)) / 24) * 100;
+          const color = seg.type === "Sleep" ? "#6FA49C" : "#9BC0B0";
+          return (
+            <div
+              key={idx}
+              className="sleep-segment"
+              style={{
+                left: `${startPct}%`,
+                width: `${widthPct}%`,
+                backgroundColor: color,
+                cursor: "pointer",
+              }}
+              onClick={() =>
+                setActiveTooltip(activeTooltip === idx ? null : idx)
+              }
+            >
+              <SleepTooltip
+                segment={seg}
+                isActive={activeTooltip === idx}
+                onClose={() => setActiveTooltip(null)}
+              />
+            </div>
+          );
+        })}
       </div>
       <span className="sleep-total-hours">{totalSleepHours} hrs</span>
     </div>
@@ -55,13 +54,11 @@ function SleepRow({ day, segments, isToday }) {
 export default function SleepLogs() {
   const navigate = useNavigate();
   const { token } = useAuth();
-
   const {
     data: rawSleepLogs = [],
     loading,
     error,
   } = useQuery("/sleep_logs", "sleep_logs");
-
   const { data: encouragements = [] } = useQuery(
     "/encouragements?category=Sleep",
     "encouragements"
@@ -71,17 +68,14 @@ export default function SleepLogs() {
   const [encouragementMsg, setEncouragementMsg] = useState("");
   const triggeredMilestonesRef = useRef(new Set());
 
-  useEffect(() => {
-    setSleepLogs(rawSleepLogs);
-  }, [rawSleepLogs]);
-
-  const todayStr = new Date().toLocaleDateString("en-CA");
+  useEffect(() => setSleepLogs(rawSleepLogs), [rawSleepLogs]);
 
   if (!token) return <p>Please sign in to view your sleep logs.</p>;
   if (loading) return <p>Loading sleep logs...</p>;
   if (error) return <p className="text-red-500">Error: {error}</p>;
 
-  // Fill missing dates for display
+  const todayStr = new Date().toLocaleDateString("en-CA");
+
   const fillMissingDates = (logs) => {
     const result = [];
     const today = new Date();
@@ -92,7 +86,6 @@ export default function SleepLogs() {
     for (let day = 1; day <= lastDay.getDate(); day++) {
       const d = new Date(year, month, day);
       const dateStr = d.toLocaleDateString("en-CA");
-
       const segments = logs
         .filter(
           (log) => new Date(log.date).toLocaleDateString("en-CA") === dateStr
@@ -109,13 +102,9 @@ export default function SleepLogs() {
             start: startHour,
             end: endHour,
             type: log.sleep_type,
-            duration:
-              endHour - startHour < 0
-                ? endHour - startHour + 24
-                : endHour - startHour,
+            duration: endHour - startHour,
           };
         });
-
       result.push({ day: d, segments });
     }
 
@@ -129,45 +118,53 @@ export default function SleepLogs() {
     0
   );
   const avgHours = (totalHours / days.length).toFixed(1);
-
   const currentMonthName = new Date().toLocaleDateString("en-US", {
     month: "long",
     year: "numeric",
   });
 
-  // --- DYNAMIC ENCOURAGEMENTS ON EVERY ENTRY ---
+  // --- HANDLE SLEEP ADDED ---
   const handleSleepAdded = (newLog) => {
-    const updatedLogs = [...sleepLogs, newLog];
-    setSleepLogs(updatedLogs);
-
-    let milestoneKey = null;
-    const logsCount = updatedLogs.length;
-
-    // Type-based milestones
-    if (newLog.sleep_type === "Nap") milestoneKey = "Nap";
-    else if (newLog.sleep_type === "FullNight") milestoneKey = "FullNight";
-    else if (logsCount === 1) milestoneKey = "FirstLog";
-
-    // Count-based milestones
-    if (logsCount === 5) milestoneKey = "5Logs";
-    else if (logsCount === 10) milestoneKey = "10Logs";
-    else if (logsCount === 20) milestoneKey = "20Logs";
-    else {
-      milestoneKey = "FirstLog";
+    // Auto-classify short sleeps (<6 hours / 360 minutes) as Nap
+    const logCopy = { ...newLog };
+    if (logCopy.sleep_type === "Sleep" && logCopy.duration < 360) {
+      logCopy.sleep_type = "Nap";
     }
 
-    // Skip if milestone already triggered
-    if (!milestoneKey || triggeredMilestonesRef.current.has(milestoneKey))
-      return;
+    setSleepLogs((prevLogs) => {
+      const updatedLogs = [...prevLogs, logCopy];
+      const logsCount = updatedLogs.length;
 
-    const milestoneEncouragement = encouragements.find(
-      (e) => e.category === "Sleep" && e.milestone === milestoneKey
-    );
+      let milestoneKey = null;
 
-    if (milestoneEncouragement) {
-      setEncouragementMsg(milestoneEncouragement.message);
-      triggeredMilestonesRef.current.add(milestoneKey);
-    }
+      // Type + duration-based milestones
+      if (logCopy.sleep_type === "Nap") milestoneKey = "Nap";
+      else if (logCopy.sleep_type === "Sleep" && logCopy.duration >= 360)
+        milestoneKey = "FullNight";
+
+      // First log
+      if (!milestoneKey && logsCount === 1) milestoneKey = "FirstLog";
+
+      // Count-based milestones
+      if (!milestoneKey) {
+        if (logsCount === 5) milestoneKey = "5Logs";
+        else if (logsCount === 10) milestoneKey = "10Logs";
+        else if (logsCount === 20) milestoneKey = "20Logs";
+      }
+
+      // Trigger encouragement only once per milestone
+      if (milestoneKey && !triggeredMilestonesRef.current.has(milestoneKey)) {
+        const milestoneEncouragement = encouragements.find(
+          (e) => e.category === "Sleep" && e.milestone === milestoneKey
+        );
+        if (milestoneEncouragement) {
+          setEncouragementMsg(milestoneEncouragement.message);
+          triggeredMilestonesRef.current.add(milestoneKey);
+        }
+      }
+
+      return updatedLogs;
+    });
   };
   // --- END HANDLE SLEEP ADDED ---
 
@@ -213,7 +210,6 @@ export default function SleepLogs() {
           onClose={() => setEncouragementMsg("")}
         />
       )}
-
       <div className="mt-6">
         <TipBox category={["Sleep", "Naps", "Sunlight"]} />
       </div>

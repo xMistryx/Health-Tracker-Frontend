@@ -18,29 +18,30 @@ export default function SleepForm({ onAdded }) {
   const calculateDuration = (startTime, endTime) => {
     const start = new Date(`2000-01-01T${startTime}`);
     let end = new Date(`2000-01-01T${endTime}`);
-
-    if (end < start) {
-      end.setDate(end.getDate() + 1);
-    }
-
-    return Math.round((end - start) / (1000 * 60)); // duration in minutes
+    if (end < start) end.setDate(end.getDate() + 1);
+    return Math.round((end - start) / (1000 * 60)); // minutes
   };
 
   const handleAddSleep = async (formData) => {
     const date = formData.get("date");
-    const sleep_type = formData.get("sleep_type");
+    let sleep_type = formData.get("sleep_type");
     const start_time = formData.get("start_time");
     const end_time = formData.get("end_time");
     const duration = calculateDuration(start_time, end_time);
 
+    // Auto-classify short sleeps < 6h as Nap
+    if (sleep_type === "Sleep" && duration < 360) {
+      sleep_type = "Nap";
+    }
+
     const newSleepLog = { date, sleep_type, start_time, end_time, duration };
 
-    const result = await mutate(newSleepLog);
-    console.log("SleepForm got result:", result, "error:", error);
-
-    if (!error) {
+    try {
+      const result = await mutate(newSleepLog);
+      onAdded?.(result || newSleepLog);
       formRef.current?.reset();
-      if (onAdded) onAdded(result || newSleepLog); // notify parent
+    } catch (err) {
+      console.error("Failed to add sleep:", err);
     }
   };
 
