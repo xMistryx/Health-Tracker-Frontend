@@ -3,7 +3,7 @@ import WaterDash from "./WaterDash";
 import SleepDash from "./SleepDash";
 import ExerciseDash from "./ExerciseDash";
 import FoodDash from "./FoodDash";
-import AffirmationBox from "./affirmation";
+import AffirmationBox from "./Affirmation";
 import "./Dashboard.css";
 
 export default function Dashboard({ user, onSignOut }) {
