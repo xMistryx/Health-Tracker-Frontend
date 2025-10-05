@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useCallback } from "react";
 import { useAuth } from "../auth/AuthContext";
 
-export const API = "http://localhost:3000";
+export const API = "https://health-tracker-backend-7me5.onrender.com";
 
 const ApiContext = createContext();
 

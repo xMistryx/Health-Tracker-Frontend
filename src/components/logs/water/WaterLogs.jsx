@@ -47,7 +47,7 @@ export default function WaterLogs() {
   // Fetch logs from backend
   const fetchLogs = async () => {
     try {
-      const res = await axios.get("http://localhost:3000/water_logs", {
+      const res = await axios.get("https://health-tracker-backend-7me5.onrender.com/water_logs", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = res.data
@@ -84,7 +84,7 @@ export default function WaterLogs() {
 
     try {
       await axios.post(
-        "http://localhost:3000/water_logs",
+        "https://health-tracker-backend-7me5.onrender.com/water_logs",
         { date, amount_oz: amount },
         { headers: { Authorization: `Bearer ${token}` } }
       );
