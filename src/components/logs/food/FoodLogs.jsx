@@ -72,10 +72,12 @@ export default function FoodLogs() {
   // --- Local-only encouragements ---
   const localFoodEncouragements = [
     {
+      category: "Food",
       milestone: "FirstMeal",
       message: "Great start! Your first meal sets the tone for the day.",
     },
     {
+      category: "Food",
       milestone: "SecondMeal",
       message: "Two meals logged—you’re staying mindful!",
     },
@@ -87,40 +89,41 @@ export default function FoodLogs() {
   ];
 
   // --- Handle food added ---
+
   const handleFoodAdded = (newLog) => {
     const updatedLogs = [...foodLogs, newLog];
     setFoodLogs(updatedLogs);
 
-    // Count meals for the date of the new log
     const dateStr = newLog.date.split("T")[0];
     const todaysLogs = updatedLogs.filter(
       (log) => log.date.split("T")[0] === dateStr
     );
-    const logsCount = todaysLogs.length; // only today
+    const logsCount = todaysLogs.length;
 
     let milestoneKey = null;
 
-    // Local milestones for first and second meal of the day
-    if (logsCount === 1) milestoneKey = "FirstMeal";
-    else if (logsCount === 2) milestoneKey = "SecondMeal";
-    else if (logsCount === 3) milestoneKey = "3Meals";
+    if (logsCount === 1) {
+      milestoneKey = "FirstMeal";
+    } else if (logsCount === 2) {
+      milestoneKey = "SecondMeal";
+    } else if (logsCount >= 3 && logsCount <= 4) {
+      milestoneKey = "3Meals";
+    } else if (logsCount >= 5 && logsCount <= 9) {
+      milestoneKey = "5Logs";
+    } else if (logsCount >= 10 && logsCount <= 19) {
+      milestoneKey = "10Logs";
+    } else if (logsCount >= 20) {
+      milestoneKey = "20Logs";
+    }
 
-    // DB milestones based on cumulative logs
-    const totalLogs = updatedLogs.length;
-    if (totalLogs === 5) milestoneKey = "5Logs";
-    else if (totalLogs === 10) milestoneKey = "10Logs";
-    else if (totalLogs === 20) milestoneKey = "20Logs";
-
-    if (!milestoneKey || triggeredMilestonesRef.current.has(milestoneKey))
-      return;
+    if (!milestoneKey) return;
 
     const milestoneEncouragement = allFoodEncouragements.find(
-      (e) => e.milestone === milestoneKey
+      (e) => e.category === "Food" && e.milestone === milestoneKey
     );
 
     if (milestoneEncouragement) {
       setEncouragementMsg(milestoneEncouragement.message);
-      triggeredMilestonesRef.current.add(milestoneKey);
     }
   };
 
