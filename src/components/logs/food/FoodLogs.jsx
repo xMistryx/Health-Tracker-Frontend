@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import useQuery from "../../api/useQuery";
@@ -63,7 +63,6 @@ export default function FoodLogs() {
 
   const [foodLogs, setFoodLogs] = useState([]);
   const [encouragementMsg, setEncouragementMsg] = useState("");
-  const triggeredMilestonesRef = useRef(new Set());
 
   useEffect(() => {
     setFoodLogs(rawFoodLogs || []);
