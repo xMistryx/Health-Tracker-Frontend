@@ -114,23 +114,19 @@ export default function SleepProgress() {
           return logDateStr === dateStr;
         })
         .map((log) => {
-          console.log("Raw log data:", log); // Debug: see what backend returns
+          // Backend returns UTC times, but we want to display them as the original local times
+          // Parse the UTC times and extract just the time components (ignore timezone conversion)
+          const startTimeStr = log.start_time; // e.g., "2025-10-06T00:18:00.000Z"
+          const endTimeStr = log.end_time; // e.g., "2025-10-06T06:19:00.000Z"
           
-          // Parse times as local time to avoid timezone conversion
-          const startTimeStr = log.start_time;
-          const endTimeStr = log.end_time;
+          // Extract hours and minutes directly from the UTC string to avoid timezone issues
+          const startMatch = startTimeStr.match(/T(\d{2}):(\d{2}):/);
+          const endMatch = endTimeStr.match(/T(\d{2}):(\d{2}):/);
           
-          // If the backend returns time strings, parse them directly
-          // This assumes format like "2024-10-06T00:00:00" or similar
-          const startTime = new Date(startTimeStr + (startTimeStr.includes('T') ? '' : 'T00:00:00'));
-          const endTime = new Date(endTimeStr + (endTimeStr.includes('T') ? '' : 'T00:00:00'));
-          
-          console.log("Parsed times:", { startTime, endTime }); // Debug
-
-          const startH = startTime.getHours();
-          const startM = startTime.getMinutes();
-          const endH = endTime.getHours();
-          const endM = endTime.getMinutes();
+          const startH = parseInt(startMatch[1]);
+          const startM = parseInt(startMatch[2]);
+          const endH = parseInt(endMatch[1]);
+          const endM = parseInt(endMatch[2]);
 
           let startHour = startH + startM / 60;
           let endHour = endH + endM / 60;
