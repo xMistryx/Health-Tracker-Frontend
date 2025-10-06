@@ -63,7 +63,9 @@ export default function SleepProgress() {
 
   const sleepLogs = rawSleepLogs || [];
 
-  const todayStr = new Date().toLocaleDateString("en-CA");
+  const today = new Date();
+  const localToday = new Date(today.getTime() - today.getTimezoneOffset() * 60000);
+  const todayStr = localToday.toISOString().split("T")[0];
 
   if (!token) {
     return (
