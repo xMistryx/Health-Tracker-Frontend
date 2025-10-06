@@ -64,7 +64,9 @@ export default function SleepProgress() {
   const sleepLogs = rawSleepLogs || [];
 
   const today = new Date();
-  const localToday = new Date(today.getTime() - today.getTimezoneOffset() * 60000);
+  const localToday = new Date(
+    today.getTime() - today.getTimezoneOffset() * 60000
+  );
   const todayStr = localToday.toISOString().split("T")[0];
 
   if (!token) {
@@ -105,24 +107,23 @@ export default function SleepProgress() {
 
     for (let day = 1; day <= lastDay.getDate(); day++) {
       const d = new Date(year, month, day);
-      const dateStr = d.toLocaleDateString("en-CA");
+      // Format as ISO date string to match backend format (YYYY-MM-DD)
+      const dateStr = d.toISOString().split('T')[0];
 
       const segments = logs
         .filter((log) => {
-          const logDate = new Date(log.date);
-          const logDateStr = logDate.toLocaleDateString("en-CA");
+          // Extract date directly from the UTC string to avoid timezone conversion
+          // log.date format: "2025-10-06T00:00:00.000Z"
+          const logDateStr = log.date.split('T')[0]; // Gets "2025-10-06"
           return logDateStr === dateStr;
         })
         .map((log) => {
-          // Backend returns UTC times, but we want to display them as the original local times
-          // Parse the UTC times and extract just the time components (ignore timezone conversion)
-          const startTimeStr = log.start_time; // e.g., "2025-10-06T00:18:00.000Z"
-          const endTimeStr = log.end_time; // e.g., "2025-10-06T06:19:00.000Z"
-          
-          // Extract hours and minutes directly from the UTC string to avoid timezone issues
+          const startTimeStr = log.start_time; 
+          const endTimeStr = log.end_time; 
+
           const startMatch = startTimeStr.match(/T(\d{2}):(\d{2}):/);
           const endMatch = endTimeStr.match(/T(\d{2}):(\d{2}):/);
-          
+
           const startH = parseInt(startMatch[1]);
           const startM = parseInt(startMatch[2]);
           const endH = parseInt(endMatch[1]);
