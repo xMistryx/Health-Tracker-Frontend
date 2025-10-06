@@ -114,8 +114,18 @@ export default function SleepProgress() {
           return logDateStr === dateStr;
         })
         .map((log) => {
-          const startTime = new Date(log.start_time);
-          const endTime = new Date(log.end_time);
+          console.log("Raw log data:", log); // Debug: see what backend returns
+          
+          // Parse times as local time to avoid timezone conversion
+          const startTimeStr = log.start_time;
+          const endTimeStr = log.end_time;
+          
+          // If the backend returns time strings, parse them directly
+          // This assumes format like "2024-10-06T00:00:00" or similar
+          const startTime = new Date(startTimeStr + (startTimeStr.includes('T') ? '' : 'T00:00:00'));
+          const endTime = new Date(endTimeStr + (endTimeStr.includes('T') ? '' : 'T00:00:00'));
+          
+          console.log("Parsed times:", { startTime, endTime }); // Debug
 
           const startH = startTime.getHours();
           const startM = startTime.getMinutes();
