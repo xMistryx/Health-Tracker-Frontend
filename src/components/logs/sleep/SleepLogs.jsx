@@ -97,6 +97,7 @@ export default function SleepProgress() {
   }
 
   function fillMissingDates(logs) {
+    console.log("All sleep logs received:", logs);
     const result = [];
 
     const today = new Date();
@@ -115,7 +116,12 @@ export default function SleepProgress() {
           // Extract date directly from the UTC string to avoid timezone conversion
           // log.date format: "2025-10-06T00:00:00.000Z"
           const logDateStr = log.date.split('T')[0]; // Gets "2025-10-06"
-          return logDateStr === dateStr;
+          console.log(`Comparing log date: ${logDateStr} with day: ${dateStr} for day ${day}`);
+          const matches = logDateStr === dateStr;
+          if (matches) {
+            console.log(`✅ Match found! Log will appear on day ${day}`);
+          }
+          return matches;
         })
         .map((log) => {
           const startTimeStr = log.start_time; 
